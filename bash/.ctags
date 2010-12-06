@@ -1,0 +1,33 @@
+--extra=+f+q
+--c-types=+p
+--langmap=make:+.mk
+--langmap=c:+.hec.hep.het.hev.hem.heo.hei.hic.hip.hit.hiv.him.hio.hii.inl.bid
+--langmap=python:+.pmake
+--exclude=*/docs/*
+--exclude=heapcon.c
+--exclude=infmt.c
+--exclude=ose_ads_lm_clib.c
+--exclude=osemain.c
+--exclude=outfmt.c
+--exclude=dbgprintf.c
+--exclude=*_E.cpp
+--exclude=SHIP-*
+--exclude=.#*
+--exclude=*.vc?
+--exclude=*/test/ARM*
+--exclude=*/test/x86*
+--exclude=*/build/*
+--exclude=*.sql
+--exclude=*.schema
+--exclude=Session.vim
+
+--links=no
+
+--langdef=js
+--langmap=js:.js
+--regex-js=/([A-Za-z0-9._$]+)[ \t]*[:=][ \t]*\{/\1/,object/
+--regex-js=/([A-Za-z0-9._$()]+)[ \t]*[:=][ \t]*function[ \t]*\(/\1/,function/
+--regex-js=/function[ \t]+([A-Za-z0-9._$]+)[ \t]*\(([^)])\)/\1/,function/
+--regex-js=/([A-Za-z0-9._$]+)[ \t]*[:=][ \t]*\[/\1/,array/
+--regex-js=/([^= ]+)[ \t]*=[ \t]*[^"]'[^']*/\1/,string/
+--regex-js=/([^= ]+)[ \t]*=[ \t]*[^']"[^"]*/\1/,string/
