@@ -1,0 +1,4 @@
+.*.sw?
+*.E
+.sw*
+.netrwhist

@@ -1,0 +1,165 @@
+# Citrix stuff
+
+Host *.xensource.com vulpix
+    TCPKeepAlive true
+    ForwardX11 true
+
+Host alf.ees.citrite.net
+    IdentityFile ~/.ssh/distfiles.key
+    User root
+
+Host ukweb1
+    Hostname ukweb1.uk.xensource.com
+
+Host drall
+    Hostname drall.uk.xensource.com
+    User root
+
+Host scale
+    Hostname scale.uk.xensource.com
+    User root
+
+Host latara
+    Hostname latara.uk.xensource.com
+    User root
+
+Host fest-2
+    Hostname fest-2.uk.xensource.com
+    User root
+
+Host hypori-2
+    Hostname hypori-2.uk.xensource.com
+    User root
+
+Host kiffu-2
+    Hostname kiffu-2.uk.xensource.com
+    User root
+
+Host taris-2
+    Hostname taris-2.uk.xensource.com
+    User root
+
+Host kail-2
+    Hostname kail-2.wlb-boston.xensource.com
+    User root
+
+Host beefy-2
+    Hostname beefy-2.eng.hq.xensource.com
+    User root
+
+Host cheesy-2
+    Hostname cheesy-2.eng.hq.xensource.com
+    User root
+
+Host chocky-2
+    Hostname chocky-2.eng.hq.xensource.com
+    User root
+
+Host chubby-2
+    Hostname chubby-2.eng.hq.xensource.com
+    User root
+
+Host elgon-2
+    Hostname elgon-2.eng.hq.xensource.com
+    User root
+
+Host pondo-2
+    Hostname pondo-2.eng.hq.xensource.com
+    User root
+
+Host skinny-2
+    Hostname skinny-2.eng.hq.xensource.com
+    User root
+
+Host froggy-2
+    Hostname froggy-2.ad.xensource.com
+    User root
+
+Host rdmbld2a
+    Hostname rdmbld2a.ad.xensource.com
+    User root
+
+Host vanbld01a
+    Hostname vanbld01a.van.xensource.com
+    User root
+
+# Craig's config items
+
+Host *V*
+	LogLevel DEBUG1
+
+Host tunnel_to_craig
+	Hostname hilly.dynalias.net
+	#Hostname 86.9.118.144
+	User vpayne
+	ForwardX11 false
+        RemoteForward 32222 localhost:22
+        RemoteForward 35999 localhost:5900
+        GatewayPorts yes
+        IdentityFile ~/.ssh/vpayne/id_rsa
+
+Host mbw*
+	Hostname hilly.dynalias.net
+	#Hostname 86.9.118.144
+	User cemery
+	ForwardX11 false
+
+Host mbw_fturton
+        User fturton
+        IdentityFile=~/.ssh/fturton
+
+Host mbw*T*
+	LocalForward 50500 localhost:50500
+	LocalForward 10025 smtp.ntlworld.com:25
+	LocalForward 15902 193.168.0.2:5900
+	LocalForward 15903 193.168.0.3:5900
+	LocalForward 15904 193.168.0.4:5900
+	LocalForward 15905 193.168.0.5:5900
+	LocalForward 15906 193.168.0.6:5900
+	LocalForward 15907 193.168.0.7:5900
+	LocalForward 15908 193.168.0.8:5900
+	LocalForward 15909 193.168.0.9:5900
+	LocalForward 15910 193.168.0.10:5900
+	LocalForward 15911 193.168.0.11:5900
+	LocalForward 15912 193.168.0.12:5900
+	LocalForward 15913 193.168.0.13:5900
+	LocalForward 16667 irc.freenode.net:6667
+        RemoteForward 15900 localhost:5900
+	LocalForward 10180 193.168.0.1:80
+	LocalForward 10280 193.168.0.2:80
+	LocalForward 10380 193.168.0.3:80
+	LocalForward 10480 193.168.0.4:80
+	LocalForward 10580 193.168.0.5:80
+	LocalForward 10680 193.168.0.6:80
+	LocalForward 10780 193.168.0.7:80
+	LocalForward 10880 193.168.0.8:80
+	LocalForward 10980 193.168.0.9:80
+	LocalForward 11080 193.168.0.10:80
+	LocalForward 11180 193.168.0.11:8080
+        # Until I get elan using port 21
+	LocalForward 32200 elan.dynalias.net:32200
+
+Host elan_via_mbw*
+	HostName localhost
+
+Host elan*
+	HostName elan.dynalias.net
+	ForwardX11 no
+	#HostName elan
+	Port 32200
+	User jokal
+
+Host elan*T*
+	LocalForward 20080 192.168.1.1:80
+	LocalForward 25901 192.168.1.1:5900
+	LocalForward 25902 192.168.1.2:5900
+	LocalForward 25903 192.168.1.3:5900
+	LocalForward 25916 192.168.1.16:5900
+	LocalForward 25999 localhost:5900
+
+Host *.sf.net *.sourceforge.net
+	IdentityFile=~/.ssh/sf
+
+Host bitbucket.org
+    User ranec
+    IdentityFile ~/.ssh/bitbucket
