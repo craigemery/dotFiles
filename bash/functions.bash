@@ -2,6 +2,7 @@
 
 . cvs.bash
 . tags.bash
+. strings.bash
 . ssh.bash
 
 # . java.bash
