@@ -23,6 +23,27 @@ Host latara
     Hostname latara.uk.xensource.com
     User root
 
+Host kail-2
+    Hostname kail-2.wlb-boston.xensource.com
+    User root
+
+# Cambridge
+Host kiffu-2
+    Hostname kiffu-2.uk.xensource.com
+    User root
+
+Host kiffu-3
+    Hostname kiffu-3.uk.xensource.com
+    User root
+
+Host kiffu-4
+    Hostname kiffu-4.uk.xensource.com
+    User root
+
+Host taris-2
+    Hostname taris-2.uk.xensource.com
+    User root
+
 Host fest-2
     Hostname fest-2.uk.xensource.com
     User root
@@ -31,32 +52,17 @@ Host hypori-2
     Hostname hypori-2.uk.xensource.com
     User root
 
-Host kiffu-2
-    Hostname kiffu-2.uk.xensource.com
-    User root
-
-Host taris-2
-    Hostname taris-2.uk.xensource.com
-    User root
-
-Host kail-2
-    Hostname kail-2.wlb-boston.xensource.com
-    User root
-
+# PA
 Host beefy-2
     Hostname beefy-2.eng.hq.xensource.com
     User root
 
-Host cheesy-2
-    Hostname cheesy-2.eng.hq.xensource.com
-    User root
-
-Host chocky-2
-    Hostname chocky-2.eng.hq.xensource.com
-    User root
-
 Host chubby-2
     Hostname chubby-2.eng.hq.xensource.com
+    User root
+
+Host skinny-2
+    Hostname skinny-2.eng.hq.xensource.com
     User root
 
 Host elgon-2
@@ -67,20 +73,61 @@ Host pondo-2
     Hostname pondo-2.eng.hq.xensource.com
     User root
 
-Host skinny-2
-    Hostname skinny-2.eng.hq.xensource.com
+Host cheesy-2
+    Hostname cheesy-2.eng.hq.xensource.com
     User root
 
+Host chocky-2
+    Hostname chocky-2.eng.hq.xensource.com
+    User root
+
+# Redmond
 Host froggy-2
     Hostname froggy-2.ad.xensource.com
+    User root
+
+Host rdmx-build1
+    Hostname rdmx-build1.ad.xensource.com
     User root
 
 Host rdmbld2a
     Hostname rdmbld2a.ad.xensource.com
     User root
 
+Host red
+    Hostname red.ad.xensource.com
+    User root
+
+#Vancouver
 Host vanbld01a
     Hostname vanbld01a.van.xensource.com
+    User root
+
+Host transit
+    Hostname transit.van.xensource.com
+    User root
+
+Host white
+    Hostname white.van.xensource.com
+    User root
+
+Host vanbld01w
+    Hostname vanbld01w.van.xensource.com
+
+Host vanbld01wsub
+    Hostname vanbld01wsub.van.xensource.com
+    User root
+
+Host xb-van-win1
+    Hostname xb-van-win1.van.xensource.com
+    User root
+
+Host xb-van-win2
+    Hostname xb-van-win2.van.xensource.com
+    User root
+
+Host xb-van-win3
+    Hostname xb-van-win3.van.xensource.com
     User root
 
 # Craig's config items
@@ -163,3 +210,5 @@ Host *.sf.net *.sourceforge.net
 Host bitbucket.org
     User ranec
     IdentityFile ~/.ssh/bitbucket
+
+# vi:ft=sshconfig
