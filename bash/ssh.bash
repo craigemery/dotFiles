@@ -37,12 +37,23 @@ function __capitalise ()
     eval "${varname}=${first}${rest}"
 }
 
+function __get_me ()
+{
+    # assume local RESULT
+    RESULT=${FUNCNAME[$((${#FUNCNAME[@]}-1))]}
+}
+
 function __wrapped_ssh ()
 {
     #Mixed args
     #Arg with param choices from an array
     #( these work great with = switch handling: find =<something> and <something> is one
     #  of the values in an array, then pretend --arg=<someting> was appropriately supplied )
+    local RESULT
+    __get_me
+    local -r me=${RESULT}
+    unset RESULT
+
     local -r -a ssh_cmds=(ssh Ssh)
     local -r ssh_cmds_l=$(listArray --comma "${ssh_cmds[@]}")
     local -r c_s="-c"
@@ -64,6 +75,12 @@ function __wrapped_ssh ()
     local -r e_h="I use extra strings on the end of hostnames to enable certain ssh options"
     local host_extra=""
 
+    local -r s_s="-s"
+    local -r s_l="--ssh"
+    local -r s_c="${s_s}|${s_l} <ssh option> or ${s_l}=<ssh option>"
+    local -r s_h="Blindly pass on option to ssh"
+    local ssh_opts=()
+
     #Solo args
     local -r v_s="-v"
     local -i verbosity=0
@@ -76,7 +93,7 @@ function __wrapped_ssh ()
     local -r h_l="--help"
     local -r sep="\n\t\t"
     local -r more_help="${sep}${h_l} for more verbose help"
-    local -r short_help="usage: ${FUNCNAME[0]} [${h_s}|${h2_s}|${h_l}] [${u_c}] [${c_c}] [${e_c}] <hostname>"
+    local -r short_help="usage: ${me} [${h_s}|${h2_s}|${h_l}] [${u_c}] [${c_c}] [${e_c}] <hostname>"
     local -r long_help="${short_help}${sep}${u_s}: ${u_h}${sep}${c_s}: ${c_h}${sep}${e_s}: ${e_h}${sep}Some flags are deducable from =*, i.e. =ssh is infered as -c ssh etc"
 
     while [[ ${#} -gt 0 ]] ; do
@@ -84,6 +101,16 @@ function __wrapped_ssh ()
         case "${arg}" in
         --*) # long switches
             case "${arg}" in
+            ${c_l}=*) ssh_cmd="${arg#${c_l}=}" ;;
+            ${c_l}) if [[ ${#} -gt 0 ]] ; then
+                        ssh_cmd="${2}" ;
+                        shift
+                    else
+                        echo "${c_l} needs an argument" >&2
+                        return -1
+                    fi
+                    ;;
+
             ${u_l}=*) user="${arg#${u_l}=}" ; shift ;;
             ${u_l}) if [[ ${#} -gt 0 ]] ; then
                         user="${2}" ;
@@ -92,11 +119,9 @@ function __wrapped_ssh ()
                         echo "${u_l} needs an argument" >&2
                         return -1
                     fi
-                    user="${2}"
-                    shift
                     ;;
 
-            ${e_l}=*) user="${arg#${e_l}=}" ; shift ;;
+            ${e_l}=*) user="${arg#${e_l}=}" ;;
             ${e_l}) if [[ ${#} -gt 0 ]] ; then
                         host_extra="${2}" ;
                         shift
@@ -104,20 +129,16 @@ function __wrapped_ssh ()
                         echo "${e_l} needs an argument" >&2
                         return -1
                     fi
-                    host_extra="${2}"
-                    shift
                     ;;
 
-            ${c_l}=*) ssh_cmd="${arg#${c_l}=}" ; shift ;;
-            ${c_l}) if [[ ${#} -gt 0 ]] ; then
-                        ssh_cmd="${2}" ;
+            ${s_l}=*) ssh_opts[${#ssh_opts}]="${arg#${s_l}=}" ;;
+            ${s_l}) if [[ ${#} -gt 0 ]] ; then
+                        ssh_opts[${#ssh_opts}]="${2}" ;
                         shift
                     else
-                        echo "${c_l} needs an argument" >&2
+                        echo "${s_l} needs an argument" >&2
                         return -1
                     fi
-                    ssh_cmd="${2}"
-                    shift
                     ;;
 
             ${h_l}) echo -e "${long_help}" ; return ;;
@@ -199,7 +220,7 @@ function __wrapped_ssh ()
     shift
 
     #Actually do work
-    ${ssh_cmd} "${user}${hostname}${host_extra}"
+    ${ssh_cmd} "${ssh_opts[@]}" "${user}${hostname}${host_extra}"
 }
 
 function make_ssh_wrappers ()

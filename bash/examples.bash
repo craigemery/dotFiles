@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
+function __get_me ()
+{
+    # assume local RESULT
+    RESULT=${FUNCNAME[$((${#FUNCNAME[@]}-1))]}
+}
+
 function __cut_and_paste_func_example ()
 {
+    local RESULT
+    __get_me
+    local -r me=${RESULT}
+    unset RESULT
+
     #Mixed args
     #Arg with param choices from an array
     #( these work great with = switch handling: find =<something> and <something> is one
@@ -33,7 +44,7 @@ function __cut_and_paste_func_example ()
     local -r h_l="--help"
     local -r sep="\n\t\t"
     local -r more_help="${sep}${h_l} for more verbose help"
-    local -r short_help="usage: ${FUNCNAME[0]} [${h_s}|${h2_s}|${h_l}] [${i_c}] [${l_c}]"
+    local -r short_help="usage: ${me} [${h_s}|${h2_s}|${h_l}] [${i_c}] [${l_c}]"
     local -r long_help="${short_help}${sep}${i_s}: ${i_h}${sep}${l_s}: ${l_h}${sep}Some flags are deducable from =*, i.e. =bounce is infered as -a bounce etc"
 
     while [[ ${#} -gt 0 ]] ; do
@@ -41,29 +52,23 @@ function __cut_and_paste_func_example ()
         case "${arg}" in
         --*) # long switches
             case "${arg}" in
-            ${i_l}=*) iteration="${arg#${i_l}=}" ; shift ;;
+            ${i_l}=*) iteration="${arg#${i_l}=}" ;;
             ${i_l}) if [[ ${#} -gt 0 ]] ; then
                         iteration="${2}" ;
                         shift
                     else
                         echo "${i_l} needs an argument" >&2
                         return -1
-                    fi
-                    iteration="${2}"
-                    shift
-                    ;;
+                    fi ;;
 
-            ${l_l}=*) locale="${arg#${l_l}=}" ; shift ;;
+            ${l_l}=*) locale="${arg#${l_l}=}" ;;
             ${l_l}) if [[ ${#} -gt 0 ]] ; then
                         locale="${2}" ;
                         shift
                     else
                         echo "${l_l} needs an argument" >&2
                         return -1
-                    fi
-                    locale="${2}"
-                    shift
-                    ;;
+                    fi ;;
 
             ${h_l}) echo -e "${long_help}" ; return ;;
             *) echo "Invalid switch '${arg}'" >&2 ; return 1 ;; # bad switch
