@@ -1,42 +1,5 @@
 #!/usr/bin/env bash
 
-function __capitalise ()
-{
-    local varname=${1}
-    local word=${!varname}
-    shift
-    [[ "${word}" ]] || return 0
-    local first=${word:0:1}
-    local rest=${word:1}
-    first=${first/a/A}
-    first=${first/b/B}
-    first=${first/c/C}
-    first=${first/d/D}
-    first=${first/e/E}
-    first=${first/f/F}
-    first=${first/g/G}
-    first=${first/h/H}
-    first=${first/i/I}
-    first=${first/j/J}
-    first=${first/k/K}
-    first=${first/l/L}
-    first=${first/m/M}
-    first=${first/n/N}
-    first=${first/o/O}
-    first=${first/p/P}
-    first=${first/q/Q}
-    first=${first/r/R}
-    first=${first/s/S}
-    first=${first/t/T}
-    first=${first/u/U}
-    first=${first/v/V}
-    first=${first/w/W}
-    first=${first/x/X}
-    first=${first/y/Y}
-    first=${first/z/Z}
-    eval "${varname}=${first}${rest}"
-}
-
 function __get_me ()
 {
     # assume local RESULT
