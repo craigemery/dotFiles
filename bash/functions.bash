@@ -4,6 +4,8 @@
 . tags.bash
 . strings.bash
 . ssh.bash
+. citrix.bash
+. home.bash
 
 # . java.bash
 # . dir.bash
@@ -1078,9 +1080,9 @@ function __v ()
     done
     #local -x T5_SRC_HOME=$(_Pw ${T5_SRC_HOME})
     #local -x VIMINIT='so $HOME\\.viminit'
-    #local -x -r exe="/cygdrive/c/Program\ Files/Vim/current/gvim.exe"
+    local -x -r exe="/cygdrive/c/Program\ Files/Vim/vim73/gvim.exe"
     #local -x -r exe="mvim"
-    local -x -r exe="/usr/bin/gvim"
+    #local -x -r exe="/usr/bin/gvim"
     if [[ "${fg}" ]] ; then
         ${exe} ${remote} -f "${args[@]}"
     else
