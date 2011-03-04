@@ -31,12 +31,12 @@ function start ()
 
 function Man ()
 {
-    __nt man man "${@}"
+    __nt -/ man man "${@}"
 }
 
 function Ssh ()
 {
-    __nt -p ssh ssh "${@}"
+    __nt -/ -p ssh ssh "${@}"
 }
 
 function Vim ()
@@ -51,10 +51,12 @@ function Xdu ()
 
 function __nt () {
     local pauseAfter=""
+    local pd="."
     local arg
     while [[ ${#} -gt 0 ]] ; do
         case "${1}" in
         -p) pauseAfter="${HOME}/dist/shell/pauseAfter" ;;
+        -/) pd="/" ;;
         -*) ;;
         *) break ;;
         esac
@@ -64,12 +66,14 @@ function __nt () {
     shift
     local -x -r command="${1}"
     shift
+    pushd "${pd}" >&-
     case "${TERM}" in
     xterm*) ( xterm -title "${name} ${*}" -geometry 86x50 -e bash -c '${command} '"${*}"'' & <&- >&- ) ;;
     screen*) screen bash -ic "titles both '${name} ${*}' ; exec ${pauseAfter} ${command} ${*}" ;;
     rxvt*) newTabDo ${pauseAfter} ${command} "${@}" ;;
     *) ${command} "${@}" ;;
     esac
+    popd >&-
 }
 
 function __shared ()
