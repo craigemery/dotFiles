@@ -17,8 +17,9 @@ function Vnc ()
     local -r file=/tmp/${who}-${$}.vnc
     local -r pw="9e0ebe4c52888c57"
     case "${who}" in
-    me|craig) local -r port=15903 ;;
-    car) local -r port=15907 ;;
+    me|craig) local -r port=15907 ;;
+    car) local -r port=15908 ;;
+    [0-9]|[0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][0-9]) local -r port=${who} ;;
     *) return ;;
     esac
     make_vnc_file "${file}" "${pw}" "${port}"
