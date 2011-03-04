@@ -71,8 +71,7 @@ function __wrapped_ssh ()
                     else
                         echo "${c_l} needs an argument" >&2
                         return -1
-                    fi
-                    ;;
+                    fi ;;
 
             ${u_l}=*) user="${arg#${u_l}=}" ; shift ;;
             ${u_l}) if [[ ${#} -gt 0 ]] ; then
@@ -81,18 +80,16 @@ function __wrapped_ssh ()
                     else
                         echo "${u_l} needs an argument" >&2
                         return -1
-                    fi
-                    ;;
+                    fi ;;
 
             ${e_l}=*) user="${arg#${e_l}=}" ;;
             ${e_l}) if [[ ${#} -gt 0 ]] ; then
-                        host_extra="${2}" ;
+                        host_extra="${host_extra}${2}" ;
                         shift
                     else
                         echo "${e_l} needs an argument" >&2
                         return -1
-                    fi
-                    ;;
+                    fi ;;
 
             ${s_l}=*) ssh_opts[${#ssh_opts}]="${arg#${s_l}=}" ;;
             ${s_l}) if [[ ${#} -gt 0 ]] ; then
@@ -101,8 +98,7 @@ function __wrapped_ssh ()
                     else
                         echo "${s_l} needs an argument" >&2
                         return -1
-                    fi
-                    ;;
+                    fi ;;
 
             ${h_l}) echo -e "${long_help}" ; return ;;
             *) echo "Invalid switch '${arg}'" >&2 ; return 1 ;; # bad switch
@@ -116,6 +112,7 @@ function __wrapped_ssh ()
                     echo "${u_s} needs an argument" >&2
                     return -1
                 fi ;;
+
         ${c_s}) if [[ ${#} -gt 0 ]] ; then
                     ssh_cmd="${2}" ;
                     shift
@@ -123,8 +120,9 @@ function __wrapped_ssh ()
                     echo "${c_s} needs an argument" >&2
                     return -1
                 fi ;;
+
         ${e_s}) if [[ ${#} -gt 0 ]] ; then
-                    host_extra="${2}" ;
+                    host_extra="${host_extra}${2}" ;
                     shift
                 else
                     echo "${e_s} needs an argument" >&2
@@ -143,17 +141,19 @@ function __wrapped_ssh ()
                 *) echo "Invalid switch '${arg}'" >&2 ; return 1 ;; # bad switch
                 esac
                 arg="${arg:1}"
-            done
-        ;;
+            done ;;
+
         =*)
             local eq_arg="${arg:1}" # remove leading equals
             if arrayHas "${eq_arg}" "${ssh_cmds[@]}" ; then
                 ssh_cmd="${eq_arg}"
+            elif [[ "${eq_arg}" = 0 ]] ; then
+                user=root
             else
                 echo "'Equals arg' '${arg}' should be an action" >&2
                 return -1
-            fi
-        ;;
+            fi ;;
+
         *) break ;;
         esac
         shift
@@ -188,7 +188,6 @@ function __wrapped_ssh ()
 
 function make_ssh_wrappers ()
 {
-    set -- mbw elan $(awk '/^Host /{h=$2};/Hostname .*\.xensource\.com/{print h}' < ~/.ssh/config)
     while [[ ${#} -gt 0 ]] ; do
         local hostname=${1}
         shift
@@ -199,7 +198,7 @@ function make_ssh_wrappers ()
     done
 }
 
-make_ssh_wrappers
+# make_ssh_wrappers
 
 function rscp ()
 {
