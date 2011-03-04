@@ -154,8 +154,8 @@ amenu 90.999.10.10 &Craig.Favourite\ &Fonts.&Misc\ Fixed.&12\ point :call Craigs
 amenu 90.999.20.10 &Craig.Favourite\ &Fonts.&Lucinda\ Typewriter.&10\ point :call CraigsFont("lucinda-type", 10)<CR>
 amenu 90.999.30.10 &Craig.Favourite\ &Fonts.&Adobe\ Courier.&9\ point :call CraigsFont("adobe-courier", 9)<CR>
 
-autocmd InsertLeave * se nocul
-autocmd InsertEnter * se cul
+"autocmd InsertLeave * se nocul
+"autocmd InsertEnter * se cul
 
 function! DiffFixAddresses()
   windo! silent exec "%s@0x0\\{8\\}@NULL@g"
