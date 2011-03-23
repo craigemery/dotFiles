@@ -139,6 +139,8 @@ function! CraigsFont (name, size)
     if a:size == 9
       set guifont=-adobe-courier-medium-r-normal-*-*-90-*-*-m-*-iso8859-1
     endif
+  elseif a:name == "monospace"
+      set guifont=Monospace\ 8
   endif
 endfunction
 
