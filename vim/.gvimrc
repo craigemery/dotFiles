@@ -27,7 +27,7 @@ set guioptions+=b
 
 "source ~/.dotFiles/vim/version_control-perforce.vim
 "source ~/.dotFiles/vim/craig.vim
-runtime craig.vim
+"runtime craig.vim
 "if has("unix")
 "elseif has("win32")
 ""   source ~/vim/version_control.vim
@@ -36,20 +36,14 @@ runtime craig.vim
 
 if has ("unix") && !has("mac")
 "   call CraigsFont("misc-fixed", 12)
-    "call CraigsFont("lucinda-type", 10)
-    call CraigsFont("monospace", 10)
-    "set guifont=Menlo\ Regular:h13
+    call CraigsFont("lucinda-type", 10)
+    set guifont=Menlo\ Regular:h13
 endif
 
 "source ~/.dotFiles/vim/resize.vim
 runtime resize.vim
-if has ("unix")
-    set lines=63
-    set columns=223
-else
-    set lines=50
-    set columns=230
-endif
+set lines=50
+set columns=230
 "set lines=44
 "set columns=126
 colorscheme koehler
