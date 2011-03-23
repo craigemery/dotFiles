@@ -696,10 +696,10 @@ function gett4repos ()
 
     local -x dir="${1}"
     echo -n "Performing CVS checkout of ${CVSMODULE} in ${dir}"
-    pushd "${dir%/*}" >&- 2>&-
+    pushd "${dir%/*}" > /dev/null 2>&1
     cvs -Q co -d "${dir##*/}" ${CVSMODULE} 2>&-
     local -i ret=${?}
-    popd >&- 2>&-
+    popd > /dev/null 2>&1
     if [ 0 -ne ${ret} ] ; then
         echo -e "\nCVS checkout failed"
         if [ -d "${dir}" ] ; then
@@ -710,7 +710,7 @@ function gett4repos ()
         return ${ret}
     fi
 
-    pushd "${dir}" >&- 2>&-
+    pushd "${dir}" > /dev/null 2>&1
     echo -ne ", done.\nGenerating tags file in ${dir}"
     CTAGS=$(cat ./tools/data/.ctags) ctags -R
     echo -ne ", done.\nGenerating dependency files in ${dir}"
@@ -719,7 +719,7 @@ function gett4repos ()
     echo -ne ", done\nPerforming CVS update in ${dir}"
     cvs -Q up 2>&-
     ret=${?}
-    popd >&- 2>&-
+    popd > /dev/null 2>&1
     if [ 0 -ne ${ret} ] ; then
         echo -ne "\nCVS update failed\nDeleting partially updated directory"
         rm -fr "${dir}"

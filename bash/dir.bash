@@ -13,9 +13,9 @@ function npwd ()
 function cd ()
 {
     if [ "${1}" ] ; then
-        pushd "${1}" >&-
+        pushd "${1}" > /dev/null
     else
-        pushd ~/ >&-
+        pushd ~/ > /dev/null
     fi
 }
 
@@ -39,9 +39,9 @@ function cdc ()
 function swap ()
 {
     if [ "${1}" ] ; then
-        pushd +1 >&-
+        pushd +1 > /dev/null
     else
-        pushd +${1} >&-
+        pushd +${1} > /dev/null
     fi
 }
 
@@ -59,7 +59,7 @@ function chdir ()
 
 function back
 {
-    popd 2>&- >&- "${@}"
+    popd > /dev/null 2>&1 "${@}"
 }
 
 function b

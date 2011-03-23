@@ -301,13 +301,13 @@ function SvnProp ()
         __realpath "${1}"
         d=${RESULT%/*}
         f=${RESULT##*/}
-        pushd "${d}" >&-
+        pushd "${d}" > /dev/null
         msg "${d}"
         case "${action}" in
         set|get) trace svn prop${action} "${prop}" "${f}" .  ;;
         list) trace svn prop${action} "${f}" ;;
         esac
-        popd >&-
+        popd > /dev/null
         shift
     done
 }

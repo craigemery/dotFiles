@@ -1,7 +1,7 @@
 " compile, build etc
 
 set makeprg=cc.bat
-compiler msvc
+"compiler msvc
 
 function! Toggle_makeprg()
     if &makeprg == "make"

@@ -66,14 +66,14 @@ function __nt () {
     shift
     local -x -r command="${1}"
     shift
-    pushd "${pd}" >&-
+    pushd "${pd}" > /dev/null
     case "${TERM}" in
     xterm*) ( xterm -title "${name} ${*}" -geometry 86x50 -e bash -c '${command} '"${*}"'' & <&- >&- ) ;;
     screen*) screen bash -ic "titles both '${name} ${*}' ; exec ${pauseAfter} ${command} ${*}" ;;
     rxvt*) newTabDo ${pauseAfter} ${command} "${@}" ;;
     *) ${command} "${@}" ;;
     esac
-    popd >&-
+    popd > /dev/null
 }
 
 function __shared ()

@@ -1,6 +1,11 @@
 #!/usr/bin/bash
 
-make_ssh_wrappers mbw elan
+function make_ssh_wrappers_home ()
+{
+    make_ssh_wrappers mbw elan carlaptopwifi carlaptopwire
+}
+
+make_ssh_wrappers_home
 
 function make_vnc_file ()
 {
@@ -17,8 +22,10 @@ function Vnc ()
     local -r file=/tmp/${who}-${$}.vnc
     local -r pw="9e0ebe4c52888c57"
     case "${who}" in
-    me|craig) local -r port=15907 ;;
-    car) local -r port=15908 ;;
+    me|craig) local -r port=15902 ;;
+    car) local -r port=15904 ;;
+    amara) local -r port=15908 ;;
+    alani) local -r port=15909 ;;
     [0-9]|[0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][0-9]) local -r port=${who} ;;
     *) return ;;
     esac
@@ -31,4 +38,3 @@ function __home ()
 {
    . home.bash
 }
-
