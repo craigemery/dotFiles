@@ -16,6 +16,8 @@ me=${0##*/}
 fullMe=${0}
 mf=.make.out # $(t5ThisDMfile)
 
+alias mq='hg -R $(hg root)/.hg/patches'
+
 function interrupt ()
 {
     # Well if I interrupt sleep (in bash) I get this return code! :-)
