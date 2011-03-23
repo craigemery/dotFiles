@@ -74,7 +74,7 @@ function __retag()
     local -r d="${1}"
     shift
     if [[ -d "${d}" ]] ; then
-        pushd "${d}" >&-
+        pushd "${d}" > /dev/null
         #[[ "${verbose}" ]] && echo "Newtags in $(npwd)"
         if [[ "${verbose}" ]] ; then
             if [[ ${#} -gt 0 ]] ; then
@@ -84,7 +84,7 @@ function __retag()
         fi
         newtag "${@}"
         #[[ -f tags ]] && linktag "${PWD}/tags" "${linkfile}"
-        popd >&-
+        popd > /dev/null
     fi
 }
 

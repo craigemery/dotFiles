@@ -217,10 +217,10 @@ function Rapp_script ()
     shift
     if Rapp_exists "${app}" ; then
         if [[ -f "${TEXPERT_HOME}/${app}/${script}" ]] ; then
-            pushd "${TEXPERT_HOME}/${app}" >&-
+            pushd "${TEXPERT_HOME}/${app}" > /dev/null
             pwd
             xtrace =f Ruby "${script}" "${@}"
-            popd >&-
+            popd > /dev/null
         fi
     fi
 }
@@ -934,11 +934,11 @@ function Rapp_each
         if [[ ${excluded} -eq 1 ]] ; then
             continue
         fi
-        pushd $d >&-
+        pushd $d > /dev/null
         msg "${d}"
         xtrace_eval =f "${@}"
         ret=${?}
-        popd >&-
+        popd > /dev/null
         if [[ -z "${keepgoing}" && ${ret} -ne 0 ]] ; then
             break
         fi
@@ -959,7 +959,7 @@ function Rrake ()
         unset RESULT
     fi
     if [[ "${app}" && -d "${current}/${app}" ]] ; then
-        pushd "${current}/${app}" >&-
+        pushd "${current}/${app}" > /dev/null
         case "${app}" in
         texpert)
             Rsphinx -q >&-
@@ -978,7 +978,7 @@ function Rrake ()
             echo "${app} needed sphinx running, it wasn't, it was started, so now it's being stopped"
             Rsphinx --stop
         fi
-        popd >&-
+        popd > /dev/null
     fi
     return ${ret}
 }
@@ -1141,13 +1141,13 @@ function Rapps_ctags ()
         __Rapps_list
         local d
         for d in "${RESULT[@]}" ; do
-            pushd $d >&-
+            pushd $d > /dev/null
             msg "$(pwd)"
             msg "Rctags -R"
             #titles both "Rctags -R"
             Rctags -R >&- 2>&- <&- &
             #fake_xterm_title
-            popd >&-
+            popd > /dev/null
         done
         if [[ "${dowait}" ]] ; then
             wait >&- 2>&-
@@ -1182,10 +1182,10 @@ function Rrake_each ()
     local d
     for f in ${RESULT[@]} ; do
         d="${f%/*}"
-        pushd "${d}" >&-
+        pushd "${d}" > /dev/null
         msg "${d}"
         xtrace_eval Rake "${@}"
-        popd >&-
+        popd > /dev/null
     done
 }
 
@@ -1234,9 +1234,9 @@ function Rapp_migrate ()
     __secondsSinceEpoch
     local -r -i start=${RESULT}
     unset RESULT
-    pushd "${TEXPERT_HOME}/${app}" >&-
+    pushd "${TEXPERT_HOME}/${app}" > /dev/null
     trace Rake db:migrate ${version}
-    popd >&-
+    popd > /dev/null
     __secondsSinceEpoch
     local -r -i end=${RESULT}
     echo "Finished raking db:migrate in $(elapsed $start $end)."
@@ -1693,7 +1693,7 @@ function Rapps_mongrels ()
             c="${cfg}"
         fi
         if [[ "${c}" ]] ; then
-            pushd "${d}" >&-
+            pushd "${d}" > /dev/null
             case "${action}" in
             query)
                 #msg "${d}"
@@ -1730,7 +1730,7 @@ function Rapps_mongrels ()
                 fi
             ;;
             esac
-            popd >&-
+            popd > /dev/null
         fi
     done
 }
@@ -1910,10 +1910,10 @@ function Rmongrel
             fi
         fi
         if [[ -e "${TEXPERT_HOME}/${app}/${yml}" ]] ; then
-            pushd "${TEXPERT_HOME}/${app}" >&-
+            pushd "${TEXPERT_HOME}/${app}" > /dev/null
             pwd
             Rcluster_action ${action} --config "${yml}" "${@}"
-            popd >&-
+            popd > /dev/null
         fi
     fi
 }
@@ -1959,9 +1959,9 @@ function Rapp_restart ()
 #    if Rarunning "${app}" ; then
 #        echo "Application ${app} already running"
 #    else
-#        pushd ${TEXPERT_HOME}/${app} >&-
+#        pushd ${TEXPERT_HOME}/${app} > /dev/null
 #        Rmongrel_rails start ${daemon} -e ${RAILS_ENV} -a 127.0.0.1 -p ${port} -P ${pid_file} -l ${log_file}
-#        popd >&-
+#        popd > /dev/null
 #    fi
 #}
 
@@ -2092,15 +2092,15 @@ function Rlocale ()
         if [[ -h "${current}" ]] ; then
             trace unlink "${current}"
         fi
-        pushd "${dir}" >&-
+        pushd "${dir}" > /dev/null
         msg ${PWD}
         trace ln -s "${locale}" current
-        popd >&-
+        popd > /dev/null
         if [[ "${svn_clean}" ]] ; then
-            pushd ${TEXPERT_HOME} >&-
+            pushd ${TEXPERT_HOME} > /dev/null
             msg Cleaning non-svn files
             SvnClean -a *
-            popd >&-
+            popd > /dev/null
         fi
         [[ "${restart_after}" ]] && Rcap_start
         return 0
@@ -2196,10 +2196,10 @@ function Rsphinx
             fi
         fi
         if [[ -f "${texpert}/${f}" ]] ; then
-            pushd "${texpert}" >&-
+            pushd "${texpert}" > /dev/null
             [[ -t 1 ]] && echo "${description} Sphinx daemon"
             ${f} ${action}
-            popd >&-
+            popd > /dev/null
         fi
     ;;
 
@@ -2207,10 +2207,10 @@ function Rsphinx
         if [[ ${pid} -gt 0 ]] ; then
             if Rpid_exists ${pid} ; then
                 if [[ -f "${texpert}/${f}" ]] ; then
-                    pushd "${texpert}" >&-
+                    pushd "${texpert}" > /dev/null
                     [[ -t 1 ]] && echo "${description} Sphinx daemon"
                     ${f} ${action}
-                    popd >&-
+                    popd > /dev/null
                 fi
             fi
         fi

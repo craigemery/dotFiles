@@ -1136,12 +1136,12 @@ function __realdir ()
 {
     #assume local RESULT
     if [[ "${1}" && -d "${1}" ]] ; then
-        pushd "${1}" >&-
+        pushd "${1}" > /dev/null
         RESULT=$(pwd -P) # I wish I could do this without spawning a sub-shell
-        popd >&-
+        popd > /dev/null
     else
         RESULT=$(pwd -P) # I wish I could do this without spawning a sub-shell
-        popd >&-
+        popd > /dev/null
     fi
 }
 
