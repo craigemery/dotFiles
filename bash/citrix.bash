@@ -2,7 +2,10 @@
 
 function make_ssh_wrappers_citrix ()
 {
-    make_ssh_wrappers $(awk '/^Host /{h=$2};/Hostname .*\.xensource\.com/{print h};/Hostname .*\.local/{print h}' < ~/.ssh/config)
+    local -r cfg_file=${HOME}/.ssh/config
+    if [[ -f "${cfg_file}" ]] ; then
+        make_ssh_wrappers $(awk '/^Host /{h=$2};/Hostname .*\.xensource\.com/{print h};/Hostname .*\.local/{print h}' < ${cfg_file})
+    fi
 }
 
 make_ssh_wrappers_citrix
@@ -11,7 +14,12 @@ function __site_vms ()
 {
     #assume local -a RESULT=()
     local -r site="${1}"
-    RESULT=($(awk 'BEGIN{site=""};/^#Site: '${site}'/{site=$2};/^Host/{if (site!=""){print $2};site=""}' < ~/.ssh/config))
+    local -r cfg_file=${HOME}/.ssh/config
+    if [[ -f "${cfg_file}" ]] ; then
+        RESULT=($(awk 'BEGIN{site=""};/^#Site: '${site}'/{site=$2};/^Host/{if (site!=""){print $2};site=""}' < ${cfg_file}))
+    else
+        RESULT=()
+    fi
 }
 
 function site_vms ()
@@ -37,7 +45,12 @@ function __ssh_site_tabs ()
 function __all_sites ()
 {
     #assume local -a RESULT=()
-    RESULT=($(awk '/^#Site:/{print $2}' < ~/.ssh/config | sort -u))
+    local -r cfg_file=${HOME}/.ssh/config
+    if [[ -f "${cfg_file}" ]] ; then
+        RESULT=($(awk '/^#Site:/{print $2}' < ${cfg_file} | sort -u))
+    else
+        RESULT=()
+    fi
 }
 
 function all_sites ()
@@ -52,9 +65,12 @@ function __make_site_tabs ()
     local -a RESULT=()
     __all_sites
     local site
-    for site in $(awk '/^#Site:/{print $2}' < ~/.ssh/config | sort -u) ; do
-        eval "function Site_tabs_${site} { __ssh_site_tabs ${site}; }"
-    done
+    local -r cfg_file=${HOME}/.ssh/config
+    if [[ -f "${cfg_file}" ]] ; then
+        for site in $(awk '/^#Site:/{print $2}' < ${cfg_file} | sort -u) ; do
+            eval "function Site_tabs_${site} { __ssh_site_tabs ${site}; }"
+        done
+    fi
 }
 
 __make_site_tabs
