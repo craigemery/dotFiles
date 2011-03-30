@@ -41,11 +41,16 @@ complete -c nohup
 
 export CTIME_HELP_DIR=/usr/share/corptime
 
-xtermTitle '${USER}@${HOSTNAME%%.*}:$(tty | sed -e s/\\/dev\\/tty//):cwd=$(npwd)'
-rxvtTitle '$(tty | sed -e s/\\/dev\\/tty//):$(npwd)'
+function ntty ()
+{
+    tty | sed -e 's/\/dev\///'
+}
+
+xtermTitle '${USER}@${HOSTNAME%%.*}:$(ntty):cwd=$(npwd)'
+rxvtTitle '$(ntty):$(npwd)'
 
 case $TERM in
-    cygwin*|screen*|xterm*)
+    *rxvt|cygwin*|screen*|xterm*)
         if [ ! -e /etc/sysconfig/bash-prompt-xterm ]; then
             PS1=""
             PROMPT_COMMAND='echo -n "$(titles both '${XTERM_TITLE}')"'
