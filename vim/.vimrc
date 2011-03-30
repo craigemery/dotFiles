@@ -223,6 +223,7 @@ runtime tags.vim
 
 "runtime trigenix.vim
 "cal T5GrowPath()
+runtime craig.vim
 
 let @c = "ce/* \" */F/"
 let @u = "3xf/2XxB"
