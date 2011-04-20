@@ -68,10 +68,26 @@ def vim_global(name, default = None):
    except:
       return default
 
+class VimAppendHandler(logging.Handler):
+   def __init__(self, name, level):
+      logging.Handler.__init__(self, level)
+      self.__name = name
+      self.__formatter = logging.Formatter()
+
+   def __findBuffer(self):
+        for b in vim.buffers:
+            if b.name.endswith(self.__name):
+                return b
+
+   def emit(self, record):
+      b = self.__findBuffer()
+      if b:
+         b.append(self.__formatter.format(record))
+
 class AutoTag:
    __maxTagsFileSize = 1024 * 1024 * 7
 
-   def __init__(self):
+   def __init__(self, logger):
       self.tags = {}
       self.excludesuffix = [ "." + s for s in vim_global("ExcludeSuffixes", "tml.xml.text.txt").split(".") ]
       self.verbosity = int(vim_global("VerbosityLevel", 0))
@@ -79,41 +95,42 @@ class AutoTag:
       self.ctags_cmd = vim_global("CtagsCmd", "ctags")
       self.tags_file = str(vim_global("TagsFile", "tags"))
       self.count = 0
+      self.logger = logger
 
    def findTagFile(self, source):
-      logging.log(self.verbosity, 'source = "%s"', source)
+      self.logger.log(self.verbosity, 'source = "%s"', source)
       ( drive, file ) = os.path.splitdrive(source)
       while file:
          file = os.path.dirname(file)
-         #logging.info('drive = "%s", file = "%s"', drive, file)
+         #self.logger.info('drive = "%s", file = "%s"', drive, file)
          tagsFile = os.path.join(drive, file, self.tags_file)
-         #logging.info('tagsFile "%s"', tagsFile)
+         #self.logger.info('tagsFile "%s"', tagsFile)
          if os.path.isfile(tagsFile):
             st = os.stat(tagsFile)
             if st:
                size = getattr(st, 'st_size', None)
                if size is None:
-                  logging.log(self.verbosity, "Could not stat tags file %s", tagsFile)
+                  self.logger.log(self.verbosity, "Could not stat tags file %s", tagsFile)
                   return None
                if AutoTag.__maxTagsFileSize and size > AutoTag.__maxTagsFileSize:
-                  logging.log(self.verbosity, "Ignoring too big tags file %s", tagsFile)
+                  self.logger.log(self.verbosity, "Ignoring too big tags file %s", tagsFile)
                   return None
             return tagsFile
          elif not file or file == os.sep or file == "//" or file == "\\\\":
-            #logging.info('bail (file = "%s")' % (file, ))
+            #self.logger.info('bail (file = "%s")' % (file, ))
             return None
       return None
 
    def addSource(self, source):
       if not source:
-         logging.log(self.verbosity, 'No source')
+         self.logger.log(self.verbosity, 'No source')
          return
       if os.path.basename(source) == self.tags_file:
-         logging.log(self.verbosity, "Ignoring tags file %s", self.tags_file)
+         self.logger.log(self.verbosity, "Ignoring tags file %s", self.tags_file)
          return
       (base, suff) = os.path.splitext(source)
       if suff in self.excludesuffix:
-         logging.log(self.verbosity, "Ignoring excluded suffix %s for file %s", source, suff)
+         self.logger.log(self.verbosity, "Ignoring excluded suffix %s for file %s", source, suff)
          return
       tagsFile = self.findTagFile(source)
       if tagsFile:
@@ -128,7 +145,7 @@ class AutoTag:
             self.tags[tagsFile] = [ relativeSource ]
 
    def stripTags(self, tagsFile, sources):
-      logging.log(self.verbosity, "Stripping tags for %s from tags file %s", ",".join(sources), tagsFile)
+      self.logger.log(self.verbosity, "Stripping tags for %s from tags file %s", ",".join(sources), tagsFile)
       backup = ".SAFE"
       input = fileinput.FileInput(files=tagsFile, inplace=True, backup=backup)
       try:
@@ -153,7 +170,7 @@ class AutoTag:
       for source in sources:
          if os.path.isfile(os.path.join(tagsDir, source)):
             cmd += " '%s'" % source
-      logging.log(self.verbosity, "%s: %s", tagsDir, cmd)
+      self.logger.log(self.verbosity, "%s: %s", tagsDir, cmd)
       do_cmd(cmd, tagsDir)
 
    def rebuildTagFiles(self):
@@ -164,8 +181,14 @@ EEOOFF
 function! AutoTag()
 python << EEOOFF
 try:
+    logger
+except:
+    logger = logging.getLogger('autotag')
+    logger.addHandler(VimAppendHandler("autotag_debug", logging.DEBUG))
+
+try:
     if long(vim_global("Disabled", 0)) == 0:
-        at = AutoTag()
+        at = AutoTag(logger)
         at.addSource(vim.eval("expand(\"%:p\")"))
         at.rebuildTagFiles()
 except:
