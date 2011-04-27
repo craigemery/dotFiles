@@ -44,6 +44,12 @@ function __wrapped_ssh ()
     local -r s_h="Blindly pass on option to ssh"
     local ssh_opts=()
 
+    local -r S_s="-S"
+    local -r S_l="--screen"
+    local -r S_c="${s_s}|${s_l}"
+    local -r S_h="Invoke screen on the remote machine (-s -t screen -l -T "\$"TERM -s -bash)"
+    local screen_opts=(-- -- -s -t -- screen)
+
     #Solo args
     local -r v_s="-v"
     local -i verbosity=0
@@ -56,12 +62,25 @@ function __wrapped_ssh ()
     local -r h_l="--help"
     local -r sep="\n\t\t"
     local -r more_help="${sep}${h_l} for more verbose help"
-    local -r short_help="usage: ${me} [${h_s}|${h2_s}|${h_l}] [${u_c}] [${c_c}] [${e_c}] <hostname>"
-    local -r long_help="${short_help}${sep}${u_s}: ${u_h}${sep}${c_s}: ${c_h}${sep}${e_s}: ${e_h}${sep}Some flags are deducable from =*, i.e. =ssh is infered as -c ssh etc"
+    local -r short_help="usage: ${me} [${h_s}|${h2_s}|${h_l}] [${u_c}] [${c_c}] [${e_c}] [${S_c}] <hostname>"
+    local -r long_help="${short_help}${sep}${u_s}: ${u_h}${sep}${c_s}: ${c_h}${sep}${e_s}: ${e_h}${sep}${S_s}: ${S_h}${sep}Some flags are deducable from =*, i.e. =ssh is infered as -c ssh etc"
+
+    if [[ ${#} -lt 1 ]] ; then
+        echo -e "Hostname must be supplied\n${long_help}" >&2
+        return 1
+    fi
+
+    case "${1}" in
+    -*) ;;
+    *)
+        local -r hostname="${1}"
+        shift
+    esac
 
     while [[ ${#} -gt 0 ]] ; do
         local arg="${1}"
         case "${arg}" in
+        --) shift ; break ;; # stop processing args
         --*) # long switches
             case "${arg}" in
             ${c_l}=*) ssh_cmd="${arg#${c_l}=}" ;;
@@ -101,6 +120,9 @@ function __wrapped_ssh ()
                     fi ;;
 
             ${h_l}) echo -e "${long_help}" ; return ;;
+
+            ${S_l}) set "${screen_opts[@]}" ;;
+
             *) echo "Invalid switch '${arg}'" >&2 ; return 1 ;; # bad switch
             esac
         ;;
@@ -129,6 +151,14 @@ function __wrapped_ssh ()
                     return -1
                 fi ;;
 
+        ${s_s}) if [[ ${#} -gt 0 ]] ; then
+                    ssh_opts[${#ssh_opts}]="${2}" ;
+                    shift
+                else
+                    echo "${e_s} needs an argument" >&2
+                    return -1
+                fi ;;
+
         -*) # short switches which take no arguments
             arg=${arg:1} # remove leading dash
             while [[ "${arg}" ]] ; do
@@ -136,6 +166,7 @@ function __wrapped_ssh ()
 
                 ${v_s}) verbosity=$((${verbosity} + 1)) ;;
                 ${d_s}) dry_run=yes ;;
+                ${S_s}) set "${screen_opts[@]}" ;;
 
                 ${h_s}|${h2_s}) echo -e "${short_help}${more_help}" ; return ;;
                 *) echo "Invalid switch '${arg}'" >&2 ; return 1 ;; # bad switch
@@ -159,11 +190,6 @@ function __wrapped_ssh ()
         shift
     done
 
-    if [[ ${#} -lt 1 ]] ; then
-        echo -e "Hostname must be supplied\n${long_help}" >&2
-        return 1
-    fi
-
     if [[ ${verbosity} -gt 0 ]] ; then
         echo '${user} = '"'${user}'" >&2
         echo '${ssh_cmd} = '"'${ssh_cmd}'" >&2
@@ -179,11 +205,8 @@ function __wrapped_ssh ()
 
     [[ "${user}" ]] && user="${user}@"
 
-    local -r hostname="${1}"
-    shift
-
     #Actually do work
-    ${ssh_cmd} "${ssh_opts[@]}" "${user}${hostname}${host_extra}"
+    ${ssh_cmd} "${ssh_opts[@]}" "${user}${hostname}${host_extra}" "${@}"
 }
 
 function make_ssh_wrappers ()
@@ -193,8 +216,8 @@ function make_ssh_wrappers ()
         shift
         local capped=${hostname}
         __capitalise capped
-        eval "function ${hostname} () { __wrapped_ssh \"\${@}\" ${hostname}; }"
-        eval "function ${capped} () { __wrapped_ssh =Ssh \"\${@}\" ${hostname}; }"
+        eval "function ${hostname} () { __wrapped_ssh ${hostname} \"\${@}\"; }"
+        eval "function ${capped} () { __wrapped_ssh ${hostname} =Ssh \"\${@}\"; }"
     done
 }
 
