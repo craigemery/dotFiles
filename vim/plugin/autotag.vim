@@ -76,7 +76,7 @@ class VimAppendHandler(logging.Handler):
 
    def __findBuffer(self):
         for b in vim.buffers:
-            if b.name.endswith(self.__name):
+            if b and b.name and b.name.endswith(self.__name):
                 return b
 
    def emit(self, record):
@@ -90,7 +90,7 @@ class AutoTag:
    def __init__(self, logger):
       self.tags = {}
       self.excludesuffix = [ "." + s for s in vim_global("ExcludeSuffixes", "tml.xml.text.txt").split(".") ]
-      self.verbosity = int(vim_global("VerbosityLevel", 0))
+      self.verbosity = int(vim_global("VerbosityLevel", 30))
       self.sep_used_by_ctags = '/'
       self.ctags_cmd = vim_global("CtagsCmd", "ctags")
       self.tags_file = str(vim_global("TagsFile", "tags"))
@@ -197,6 +197,15 @@ EEOOFF
     if exists(":TlistUpdate")
         TlistUpdate
     endif
+endfunction
+
+function! AutoTagDebug()
+   new
+   file autotag_debug
+   setlocal buftype=nowrite
+   setlocal bufhidden=delete
+   setlocal noswapfile
+   normal 
 endfunction
 
 augroup autotag
