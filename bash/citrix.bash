@@ -16,7 +16,7 @@ function __site_vms ()
     local -r site="${1}"
     local -r cfg_file=${HOME}/.ssh/config
     if [[ -f "${cfg_file}" ]] ; then
-        RESULT=($(awk 'BEGIN{site=""};/^#Site: '${site}'/{site=$2};/^Host/{if (site!=""){print $2};site=""}' < ${cfg_file}))
+        RESULT=($(awk 'BEGIN{site=""};/^#Site: '${site}'/{site=$2};/^Host/{if (site!=""){print $2};site=""}' < ${cfg_file} | sort))
     else
         RESULT=()
     fi
@@ -74,6 +74,21 @@ function __make_site_tabs ()
 }
 
 __make_site_tabs
+
+function __make_mstsc_func ()
+{
+    local -r host="${1}"
+    local -i i
+    local -r pa=xb-pa-win
+    local -r cam=xb-cam-win
+    local -r rdm=xb-rdm-win
+    local -r ma=xb-ma-win
+    local -r van=xb-van-win
+    local -r blr=xb-blr-win
+    case ${host} in
+    xb-rdm-win*) ;;
+    esac
+}
 
 function __citrix ()
 {
