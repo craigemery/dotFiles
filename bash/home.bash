@@ -20,10 +20,11 @@ function Vnc ()
 {
     local -r who="${1}"
     local -r file=/tmp/${who}-${$}.vnc
-    local -r pw="9e0ebe4c52888c57"
+    local -r me_pw="9e0ebe4c52888c57"
+    local -r car_pw="ec0e5c3b446829a9"
     case "${who}" in
-    me|craig) local -r port=15902 ;;
-    car) local -r port=15904 ;;
+    me|craig) local -r port=15902 ; local pw=${me_pw} ;;
+    car) local -r port=15904 ; local pw=${car_pw} ;;
     amara) local -r port=15908 ;;
     alani) local -r port=15909 ;;
     [0-9]|[0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][0-9]) local -r port=${who} ;;
