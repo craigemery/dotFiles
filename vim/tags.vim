@@ -76,12 +76,11 @@ function! TagsAction (action, tf)
     return ret
 endfunction
 
-let g:autotagVerbosityLevel=1
 if has("win32")
   let g:autotagCtagsCmd=g:ctags_command
 endif
 "source ~/.dotFiles/vim/autotag.vim
-runtime autotag.vim
+"runtime autotag.vim
 
 function! PreviewWord()
   if &previewwindow			" don't do this in the preview window
