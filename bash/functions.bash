@@ -988,7 +988,7 @@ function caselessRE ()
 
 function getCR ()
 {
-    local ret=${1}
+    local -i ret=${1}
     [[ -t 1 ]] && colour fg green
     trap "echo '' ; stty echo ; return ${ret}" INT
     echo -ne "Please hit return to continue:"
@@ -1002,7 +1002,7 @@ function getCR ()
 
 function maybeGetCR ()
 {
-    local ret=${1}
+    local -i ret=${1}
     if [[ "${err}" ]] ; then
         if [[ ${ret} = ${err} ]] ; then
             getCR ${ret}
