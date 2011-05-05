@@ -75,19 +75,38 @@ function __make_site_tabs ()
 
 __make_site_tabs
 
-function __make_mstsc_func ()
+function xbrdp ()
 {
-    local -r host="${1}"
-    local -i i
     local -r pa=xb-pa-win
     local -r cam=xb-cam-win
     local -r rdm=xb-rdm-win
     local -r ma=xb-ma-win
     local -r van=xb-van-win
     local -r blr=xb-blr-win
-    case ${host} in
-    xb-rdm-win*) ;;
-    esac
+    while [[ ${#} -gt 0 ]] ; do
+        local arg="${1}"
+        shift
+        local host="${arg}"
+        case ${host} in
+        xb-*) ;;
+        *) host=xb-${host} ;;
+        esac
+        case ${host} in
+        ${pa}*) host=${host}.eng.hq ;;
+        ${cam}*) host=${host}.uk ;;
+        #${rdm}*) host=${host}.eng.hq ;;
+        #${ma}*) host=${host}.eng.hq ;;
+        #${van}*) host=${host}.eng.hq ;;
+        #${blr}*) host=${host}.eng.hq ;;
+        esac
+        case ${host} in
+        *.xensource.com) ;;
+        *) host=${host}.xensource.com ;;
+        esac
+        case ${host} in
+        *[0-9]*) __nt -P rdp:${arg} mstsc /admin /v:${host} ; sleep 3 ;;
+        esac
+    done
 }
 
 function __citrix ()
