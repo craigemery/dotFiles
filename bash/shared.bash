@@ -31,7 +31,7 @@ function start ()
 
 function Man ()
 {
-    __nt -/ man man "${@}"
+    __nt -/ "man $*" man "${@}"
 }
 
 function Ssh ()
@@ -50,12 +50,13 @@ function Xdu ()
 }
 
 function __nt () {
-    local pauseAfter=""
+    local runner=""
     local pd="."
     local arg
     while [[ ${#} -gt 0 ]] ; do
         case "${1}" in
-        -p) pauseAfter="${HOME}/dist/shell/pauseAfter" ;;
+        -p) runner="${HOME}/dist/shell/pauseAfter" ;;
+        -P) runner="${HOME}/dist/shell/pauseOnError" ;;
         -/) pd="/" ;;
         -*) ;;
         *) break ;;
@@ -68,9 +69,9 @@ function __nt () {
     shift
     pushd "${pd}" > /dev/null
     case "${TERM}" in
-    xterm*) ( xterm -title "${name} ${*}" -geometry 86x50 -e bash -c '${command} '"${*}"'' & <&- >&- ) ;;
-    screen*) screen bash -ic "titles both '${name} ${*}' ; exec ${pauseAfter} ${command} ${*}" ;;
-    rxvt*) newTabDo ${pauseAfter} ${command} "${@}" ;;
+    xterm*) ( xterm -title "${name}" -geometry 86x50 -e bash -c '${command} '"${*}"'' & <&- >&- ) ;;
+    screen*) screen -t "${name}" bash -ic "titles both '${name}' ; exec ${runner} ${command} ${*}" ;;
+    rxvt*) newTabDo ${runner} ${command} "${@}" ;;
     *) ${command} "${@}" ;;
     esac
     popd > /dev/null
