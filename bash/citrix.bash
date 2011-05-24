@@ -109,6 +109,40 @@ function xbrdp ()
     done
 }
 
+function make_source ()
+{
+    local -ir build=${1} ; shift
+    local -r branch=${1} ; shift
+    curl -F "class=jobform;product=carbon;branch=${branch};site=pa;job=sources;action=xe-phase-3-build;number=${build};cmd=request;submit=Start" "http://xenbuilder.uk.xensource.com/builds?q_view=details&amp;q_product=carbon&amp;q_branch=${branch};q_number=${build}"
+}
+
+function release_build () {
+    local -i -r build_number=${1}
+    local -r branch=${2}
+    local -r kind=${3}
+    /usr/groups/build/${branch}/${build_number}/xe-phase-1/do-release.sh -n ${build_number} -b ${branch} -k ${kind}
+    #~/xenbuilder-scripts.hg/do-release.sh
+}
+
+function wait_for_build_phase()
+{
+    local -i -r build_number=${1}
+    local -r branch=${2}
+    local -i -r phase=${3}
+    local -r link=/usr/groups/build/${branch}/xe-phase-${phase}-latest
+    while [[ $(readlink ${link}) -ne ${build_number} ]] ; do
+        echo $(TZ=Europe/London date) : ${link} = $(readlink ${link}) not ${build_number}
+        sleep 60
+    done
+}
+
+function release_build_when_ready () {
+    local -i -r build_number=${1}
+    local -r branch=${2}
+    local -r kind=${3}
+    wait_for_build_phase ${build_number} ${branch} 3 && release_build ${build_number} ${branch} ${kind}
+}
+
 function __citrix ()
 {
     . citrix.bash
