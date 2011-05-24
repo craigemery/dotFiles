@@ -70,7 +70,7 @@ function __nt () {
     pushd "${pd}" > /dev/null
     case "${TERM}" in
     xterm*) ( xterm -title "${name}" -geometry 86x50 -e bash -c '${command} '"${*}"'' & <&- >&- ) ;;
-    screen*) screen -t "${name}" bash -ic "titles both '${name}' ; exec ${runner} ${command} ${*}" ;;
+    screen*) screen -t "${name}" bash -ic ". ~/.dotFiles/bash/bootstrap.bash ; titles both '${name}' ; exec ${runner} ${command} ${*}" ;;
     rxvt*) newTabDo ${runner} ${command} "${@}" ;;
     *) ${command} "${@}" ;;
     esac
