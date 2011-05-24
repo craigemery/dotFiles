@@ -48,12 +48,13 @@ else:
 
    from traceback import format_exc
 
-def goodTag(line, excluded):
+def goodTag(line, excluded, verbosity = 0):
    if line[0] == '!':
       return True
    else:
       f = string.split(line, '\t')
-      if len(f) > 3 and not f[1] in excluded:
+      logger.log(verbosity, "read tags line:%s", str(f))
+      if len(f) > 3 and f[1] not in excluded:
          return True
    return False
 
@@ -151,7 +152,7 @@ class AutoTag:
       try:
          for l in input:
             l = l.strip()
-            if goodTag(l, sources):
+            if goodTag(l, sources, self.verbosity):
                print l
       finally:
          input.close()
