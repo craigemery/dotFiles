@@ -5,6 +5,10 @@
 "endif
 
 let Tlist_Show_Menu=1
+if has("win32")
+  let $PATH = $PATH . ";C:/Program Files/Git/bin"
+  let $PATH = $PATH . ";C:/cygwin/bin"
+endif
 
 set nocompatible
 
