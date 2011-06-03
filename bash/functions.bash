@@ -879,7 +879,7 @@ function findSuffixed ()
 function __sourceSuffixes ()
 {
     #assume local -a RESULT=()
-    RESULT=(py pm pmake cc c cpp cxx l y rb js erb yml m)
+    RESULT=(py tac pm pmake cc c cpp cxx l y rb js erb yml m)
 }
 
 function findSources ()
