@@ -36,7 +36,7 @@ function Man ()
 
 function Ssh ()
 {
-    __nt -/ -p ssh ssh "${@}"
+    __nt -/ -p "ssh ${*}" ssh "${@}"
 }
 
 function Vim ()
