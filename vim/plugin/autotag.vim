@@ -9,6 +9,10 @@ endif
 
 let g:autotag_vim_version_sourced=s:autotag_vim_version
 
+if !exists("g:autotagmaxTagsFileSize")
+   let g:autotagmaxTagsFileSize=1024*1024*7
+endif
+
 " This file supplies automatic tag regeneration when saving files
 " There's a problem with ctags when run with -a (append)
 " ctags doesn't remove entries for the supplied source file that no longer exist
@@ -86,7 +90,7 @@ class VimAppendHandler(logging.Handler):
          b.append(self.__formatter.format(record))
 
 class AutoTag:
-   __maxTagsFileSize = 1024 * 1024 * 7
+   __maxTagsFileSize = vim.eval("g:autotagmaxTagsFileSize")
 
    def __init__(self, logger):
       self.tags = {}
