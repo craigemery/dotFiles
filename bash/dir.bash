@@ -19,6 +19,19 @@ function cd ()
     fi
 }
 
+function with_cd ()
+{
+    cd "${1}" ; shift
+    "${@}"
+    back
+}
+
+function with_cd_eval ()
+{
+    local -r d="${1}" ; shift
+    with_cd "${d}" eval "${*}"
+}
+
 function cdl ()
 {
     local -i count=0
