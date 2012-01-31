@@ -252,4 +252,29 @@ function __python ()
    . python.bash
 }
 
+unset winpdb
+unset pyro_wxnsc
+unset pyro_es
+unset pyro_ns
+unset __pydo
+unset pcp
+unset cpy
+unset cpy252
+unset __cpy
+unset pyd
+unset py
+unset pyd30
+unset py30
+unset pyd27
+unset py27
+unset pyd26
+unset py26
+unset pyd25
+unset py25
+unset pyd24
+unset py24
+unset pyd23
+unset py23
+unset __py
+
 # vim:sw=4
