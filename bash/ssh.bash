@@ -211,11 +211,15 @@ function __wrapped_ssh ()
 
 function make_ssh_wrappers ()
 {
+    local -i verbose=0
+    [ "${1}" = -v ] && shift && verbose=1
+    readonly verbose
     while [[ ${#} -gt 0 ]] ; do
         local hostname=${1}
         shift
         local capped=${hostname}
         __capitalise capped
+        [ ${verbose} -ne 0 ] && echo "Making wrapper ${capped}"
         eval "function ${hostname} () { __wrapped_ssh ${hostname} \"\${@}\"; }"
         eval "function ${capped} () { __wrapped_ssh ${hostname} =Ssh \"\${@}\"; }"
     done
