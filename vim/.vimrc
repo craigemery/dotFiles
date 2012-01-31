@@ -4,6 +4,8 @@
 "call InitPerforce()
 "endif
 
+filetype plugin on
+
 let Tlist_Show_Menu=1
 if has("win32")
   let $PATH = $PATH . ";C:/Program Files/Git/bin"
