@@ -96,7 +96,9 @@ function secondsSinceEpoch ()
 
 function timeFromSecondsSinceEpoch ()
 {
-    date --date="Jan 1 1970 + ${1} seconds"
+    local -r -i sse=${1}
+    shift
+    date --date="Jan 1 1970 + ${sse} seconds" "${@}"
 }
 
 function elapsed ()
