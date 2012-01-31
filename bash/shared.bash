@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. python.bash
+#. python.bash
 
 function fileBiggerThanScreen ()
 {
@@ -49,6 +49,17 @@ function Xdu ()
     __nt -p xdu ${HOME}/dist/bin/xdiskusage
 }
 
+function __term_type ()
+{
+    #assume local RESULT
+    case "${TERM}" in
+    xterm*) RESULT=xterm ;;
+    screen*) RESULT=screen ;;
+    rxvt*) RESULT=rxvt ;;
+    *) RESULT="" ;;
+    esac
+}
+
 function __nt () {
     local runner=""
     local pd="."
@@ -68,12 +79,15 @@ function __nt () {
     local -x -r command="${1}"
     shift
     pushd "${pd}" > /dev/null
-    case "${TERM}" in
-    xterm*) ( xterm -title "${name}" -geometry 86x50 -e bash -c '${command} '"${*}"'' & <&- >&- ) ;;
-    screen*) screen -t "${name}" bash -ic ". ~/.dotFiles/bash/bootstrap.bash ; titles both '${name}' ; exec ${runner} ${command} ${*}" ;;
-    rxvt*) newTabDo ${runner} ${command} "${@}" ;;
+    local RESULT
+    __term_type
+    case "${RESULT}" in
+    xterm) ( xterm -title "${name}" -geometry 86x50 -e bash -c '${command} '"${*}"'' & <&- >&- ) ;;
+    screen) screen -t "${name}" bash -ic ". ~/.dotFiles/bash/bootstrap.bash ; titles both '${name}' ; exec ${runner} ${command} ${*}" ;;
+    rxvt) newTabDo ${runner} ${command} "${@}" ;;
     *) ${command} "${@}" ;;
     esac
+    unset RESULT
     popd > /dev/null
 }
 
