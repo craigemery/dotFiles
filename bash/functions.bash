@@ -18,6 +18,28 @@
 # . protest.bash
 # . barona.bash
 
+function __funcname_entry()
+{
+    local -i idx=${1}
+    local -r -i len=${#FUNCNAME[@]}
+    if [[ ${idx} < 0 ]] ; then
+        idx=$((${#FUNCNAME[@]} - ${idx} - 1))
+    elif [[ ${idx} > $((${len} - 1)) ]] ; then
+        echo "Bad idx $idx" >&2
+        return 1
+    fi
+    RESULT=${FUNCNAME[${idx}]}
+    return 0
+}
+
+function __me ()
+{
+    local RESULT
+    __funcname_entry 1
+    # Assume caller has local me
+    me=${RESULT}
+}
+
 function lr ()
 {
 # need to escape the ls command coz there's an alias that has --color=auto & it overrides the =yes
@@ -75,6 +97,8 @@ function which_file ()
     local -a found_func=($(shopt -s extdebug ; declare -F "${1}"))
     if [ ${#found_func[@]} -gt 0 ] ; then
         file=${found_func[2]}
+        local HOMEfile="${HOME}/${file}"
+        [[ ! -f ${file} && -f "${HOMEfile}" ]] && file=${HOMEfile}
     fi
 
     if [ -z "${file}" ] ; then
@@ -464,8 +488,8 @@ function replace_vim_reg_exp ()
 unset __findIn
 function __FI ()
 {
-    local -r cmdName="${1}"
-    shift
+    #local -r cmdName="${1}"
+    #shift
     local -r findCmdName="${1}"
     shift
     local error=""
@@ -475,6 +499,7 @@ function __FI ()
     local case=""
     local numbers=""
     local ignoreBinary=""
+    local noerrors=""
     local less=""
     local -i before=0
     local -i after=0
@@ -491,6 +516,8 @@ function __FI ()
     local -r aLongFlag="--after-context"
     local -r ignoreBinaryFlag="-I"
     local -r ignoreBinaryLongFlag="--binary-files=without-match"
+    local -r sFlag="-s"
+    local -r sLongFlag="--no-messages"
     local -r xFlag="-x"
     local -a excludes=()
     local -r lFlag="-l"
@@ -561,10 +588,14 @@ function __FI ()
         ${vFlag}|${vLongFlag})
             useVimRegExp=yes
         ;;
+        ${sFlag}|${sLongFlag})
+            noerrors="2> /dev/null"
+        ;;
         --) shift ; break ;;
         -*)
+            local RESULT ; __funcname_entry 2
             echo "Invalid argument: ${1}" >&2
-            echo -ne "usage:\t${cmdName} [[${aFlag} N|${aLongFlag}=N] [${BFlag} N|${BLongFlag}=N] ${caseFlag} ${numbersFlag}] [${ignoreBinaryFlag}|${ignoreBinaryLongFlag}] [${wFlag}|${wLongFlag}] [${cFlag}|${cLongFlagUK}|${cLongFlagUS}] [${bFlag}|${bLongFlag}] [${PFlag}] [-l|--list] " >&2
+            echo -ne "usage:\t${RESULT} [[${aFlag} N|${aLongFlag}=N] [${BFlag} N|${BLongFlag}=N] ${caseFlag} ${numbersFlag}] [${ignoreBinaryFlag}|${ignoreBinaryLongFlag}] [${wFlag}|${wLongFlag}] [${cFlag}|${cLongFlagUK}|${cLongFlagUS}] [${bFlag}|${bLongFlag}] [${PFlag}] [-l|--list] " >&2
             echo "[<directory>] <regular expression>" >&2
             error="yes"
             break
@@ -629,9 +660,19 @@ function __FI ()
 function deTrailingSlash ()
 {
     #assume local -a RESULT
+    if [[ ${#} -gt 0 && "${1}" = "--skip-links" ]] ; then
+        shift
+        local -r skip_links=1
+    else
+        local -r skip_links=0
+    fi
     RESULT=()
     while [[ ${#} -gt 0 ]] ; do
-        RESULT[${#RESULT[@]}]=${1%/}
+        if [[ ${skip_links} -eq 0 ]] ; then
+            RESULT[${#RESULT[@]}]=${1%/}
+        else
+            RESULT[${#RESULT[@]}]=${1}
+        fi
         shift
     done
 }
@@ -727,7 +768,7 @@ function findFiles ()
         i=$((${i} + 1))
     done
     local -a RESULT
-    deTrailingSlash "${@}"
+    deTrailingSlash --skip-links "${@}"
     set -- "${RESULT[@]}"
     if [[ ${#prune_dir_flags[@]} -gt 0 ]] ; then
         local -r -a pruning=(\( -type d \( "${prune_dir_flags[@]}" \) -prune \) -o)
@@ -739,7 +780,7 @@ function findFiles ()
 
 function FI ()
 {
-    __FI FI findFiles "${@}"
+    __FI findFiles "${@}"
 }
 
 function suffixOneOf ()
@@ -891,7 +932,7 @@ function findSources ()
 
 function FISources ()
 {
-    __FI FISources findSources "${@}"
+    __FI findSources "${@}"
 }
 
 function __headerSuffixes ()
@@ -909,7 +950,7 @@ function findHeaders ()
 
 function FIHeaders ()
 {
-    __FI FIHeaders findHeaders "${@}"
+    __FI findHeaders "${@}"
 }
 
 function __sourceAndHeaderSuffixes ()
@@ -930,7 +971,7 @@ function findSourcesAndHeaders ()
 
 function FISourcesAndHeaders ()
 {
-    __FI FISourcesAndHeaders findSourcesAndHeaders "${@}"
+    __FI findSourcesAndHeaders "${@}"
 }
 
 function findMakefiles ()
@@ -951,7 +992,7 @@ function findMakefiles ()
 
 function FIMakefiles ()
 {
-    __FI FIMakefiles findMakefiles "${@}"
+    __FI findMakefiles "${@}"
 }
 
 function findMarkup ()
@@ -962,7 +1003,7 @@ function findMarkup ()
 
 function FIMarkup ()
 {
-    __FI FIMarkup findMarkup "${@}"
+    __FI findMarkup "${@}"
 }
 
 function findSwaps ()
@@ -1033,7 +1074,7 @@ function rxvt ()
 
 function e ()
 {
-    local -r me="${FUNCNAME[0]}"
+    local me ; __me
     [[ ${#} -gt 0 ]] && set -- =r "${@}"
     __v "${@}"
 }
@@ -1045,19 +1086,19 @@ function E ()
 
 function v ()
 {
-    local -r me="${FUNCNAME[0]}"
+    local me ; __me
     __v "${@}"
 }
 
 function V ()
 {
-    local -r me="${FUNCNAME[0]}"
+    local me ; __me
     __v -f "${@}"
 }
 
 function __v ()
 {
-    #assume local -r me="${0}"
+    local me ; __me
     local fg=""
     local arg
     local -x -a args=()
@@ -1090,40 +1131,44 @@ function __v ()
     fi
 }
 
-function mvrm ()
-{
-    if [[ "${1}" = "-d" ]] ; then
-        shift
-        local -r action=diag
-    else
-        local -r action=trace
-    fi
-    local -a moved_files=()
-    local moved=""
-    local -a args=()
-    local -r temp_dir=$(mktemp -d)
-    local arg=""
-    local dir_flag=""
-    local parent=""
-    for arg in "${@}" ; do
-        if [[ -e "${arg}" ]] ; then
-            if [[ -d "${arg}" ]] ; then
-                dir_flag="-d"
-            else
-                dir_flag=""
-            fi
-            parent="${arg%/*}"
-            moved=$(mktemp ${dir_flag} -p "${parent}" mvrm.XXXXXXXXXX)
-            rm -fr "${moved}"
-            ${action} mv "${arg}" "${moved}"
-            moved_files=( "${moved_files[@]}" "${moved}" )
-        else
-            args=( "${args[@]}" "${arg}" )
-        fi
-    done
-    titles both "rm ${args[@]} ${moved_files[@]}" >&2
-    trace rm "${args[@]}" "${moved_files[@]}"
-}
+#function mvrm ()
+#{
+#    if [[ "${1}" = "-d" ]] ; then
+#        shift
+#        local -r action=diag
+#    else
+#        local -r action=trace
+#    fi
+#    local -a moved_files=()
+#    local moved=""
+#    local -a args=()
+#    local -r temp_dir=$(mktemp -d)
+#    local arg=""
+#    local dir_flag=""
+#    local parent=""
+#    for arg in "${@}" ; do
+#        if [[ -e "${arg}" ]] ; then
+#            case "${arg}" in
+#            */*) ;;
+#            *) arg=${PWD}/${arg} ;;
+#            esac
+#            if [[ -d "${arg}" ]] ; then
+#                dir_flag="-d"
+#            else
+#                dir_flag=""
+#            fi
+#            parent="${arg%/*}"
+#            moved=$(mktemp ${dir_flag} -p "${parent}" mvrm.XXXXXXXXXX)
+#            rm -fr "${moved}"
+#            ${action} mv "${arg}" "${moved}"
+#            moved_files=( "${moved_files[@]}" "${moved}" )
+#        else
+#            args=( "${args[@]}" "${arg}" )
+#        fi
+#    done
+#    titles both "rm ${args[@]} ${moved_files[@]}" >&2
+#    ${action} rm "${args[@]}" "${moved_files[@]}"
+#}
 
 . shared.bash
 
