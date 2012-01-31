@@ -1,10 +1,11 @@
 #!/usr/bin/bash
+. hg.bash
 
 function make_ssh_wrappers_citrix ()
 {
     local -r cfg_file=${HOME}/.ssh/config
     if [[ -f "${cfg_file}" ]] ; then
-        make_ssh_wrappers $(awk '/^Host /{h=$2};/Hostname .*\.xensource\.com/{print h};/Hostname .*\.local/{print h}' < ${cfg_file})
+        make_ssh_wrappers $(awk '/^Host /{h=$2;gsub(/\*$/,"",$2);};/Hostname .*\.xensource\.com/{print h};/Hostname .*\.citrix\.com/{print h};/Hostname .*\.local/{print h}' < ${cfg_file})
     fi
 }
 
@@ -16,7 +17,7 @@ function __site_vms ()
     local -r site="${1}"
     local -r cfg_file=${HOME}/.ssh/config
     if [[ -f "${cfg_file}" ]] ; then
-        RESULT=($(awk 'BEGIN{site=""};/^#Site: '${site}'/{site=$2};/^Host/{if (site!=""){print $2};site=""}' < ${cfg_file} | sort))
+        RESULT=($(awk 'BEGIN{site=""};/^#Site: '${site}'/{site=$2};/^Host/{if (site!=""){gsub(/\*$/,"",$2);print $2};site=""}' < ${cfg_file} | sort))
     else
         RESULT=()
     fi
@@ -120,7 +121,7 @@ function release_build () {
     local -i -r build_number=${1}
     local -r branch=${2}
     local -r kind=${3}
-    /usr/groups/build/${branch}/${build_number}/xe-phase-1/do-release.sh -n ${build_number} -b ${branch} -k ${kind}
+    /usr/groups/build/${branch}/${build_number}/xe-phase-1/do-release.sh -k ${kind}
     #~/xenbuilder-scripts.hg/do-release.sh
 }
 
@@ -141,6 +142,43 @@ function release_build_when_ready () {
     local -r branch=${2}
     local -r kind=${3}
     wait_for_build_phase ${build_number} ${branch} 3 && release_build ${build_number} ${branch} ${kind}
+}
+
+function check_page ()
+{
+    local -r dest=/tmp/check_page/$$
+    [[ -d ${dest} ]] || mkdir -p ${dest}
+    pushd ${dest}
+    wget -r -nd --delete-after "${@}" 2>&1 | awk '/^--.*--  http:\/\/.*/{url=$NF};/HTTP request sent, awaiting response/{if ($NF != "OK"){printf "%s %s %s\n", url, $(NF-1), $NF} }'
+    popd
+    rm -fr ${dest}
+}
+
+function check_release ()
+{
+    check_page "http://coltrane.eng.hq.xensource.com/release/${*}"
+}
+
+function mvrm ()
+{
+    local r path="${1}"
+    if [[ -e "${path}" ]] ; then
+        case "${path}" in
+        */?*) ;;
+        */) path=${PWD}/${path%/};;
+        *) path=${PWD}/${path} ;;
+        esac
+        local -r dir=${path%/*}
+        local -r delme="${dir}/.delme"
+        local -r delit="${delme}/$$"
+        if [[ ! -d "${delme}" ]] ; then
+            mkdir "${delme}"
+        fi
+        if [[ -d "${delme}" ]] ; then
+            trace mv "${path}" "${delit}" && trace rm -fr "${delit}"
+            rmdir "${delme}" 2>&-
+        fi
+    fi
 }
 
 function __citrix ()
