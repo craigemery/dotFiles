@@ -64,19 +64,25 @@ else:
 
    from traceback import format_exc
 
-def vim_global(name, default = None):
-   ret = default or vim_global_defaults.get(name, None)
+def vim_global(name, kind = string):
+   ret = vim_global_defaults.get(name, None)
    try:
       v = "g:autotag%s" % name
       exists = (vim.eval("exists('%s')" % v) == "1")
       if exists:
          ret = vim.eval(v)
       else:
-         if isinstance(not_found, int):
-            vim.command("let %s=%s" % (v, not_found))
+         if isinstance(ret, int):
+            vim.command("let %s=%s" % (v, ret))
          else:
-            vim.command("let %s=\"%s\"" % (v, not_found))
+            vim.command("let %s=\"%s\"" % (v, ret))
    finally:
+      if kind == bool:
+         ret = (ret not in [0, "0"])
+      elif kind == int:
+         ret = int(ret)
+      elif kind == string:
+         pass
       return ret
 
 class VimAppendHandler(logging.Handler):
@@ -224,7 +230,7 @@ EEOOFF
 function! AutoTag()
 python << EEOOFF
 try:
-   if not vim_global("Disabled"):
+   if not vim_global("Disabled", bool):
       at = AutoTag()
       at.addSource(vim.eval("expand(\"%:p\")"))
       at.rebuildTagFiles()
