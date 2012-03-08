@@ -34,6 +34,8 @@ export HISTSIZE=1000
 
 export CDPATH=.:${HOME}
 export PAGER=less
+export LESS="-R"
+export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"
 
 complete -d -X \*CVS cd
 complete -A alias alias
