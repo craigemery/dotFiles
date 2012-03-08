@@ -193,7 +193,7 @@ function dqpbo ()
             less +F "${mf}"
         else
             if fileBiggerThanScreen "${mf}" ; then
-                fmo < "${mf}" 2>&1 | less -R +G
+                fmo < "${mf}" 2>&1 | less +G
             else
                 fmo < "${mf}" 2>&1
             fi

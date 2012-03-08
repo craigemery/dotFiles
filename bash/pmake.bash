@@ -220,7 +220,7 @@ function dpmo ()
     local mf=".${USER}.pmake.out"
     if [ -f ${mf} ] ; then
         if fileBiggerThanScreen ${mf} ; then
-            fmo < ${mf} 2>&1 | less -R
+            fmo < ${mf} 2>&1 | less
         else
             fmo < ${mf} 2>&1
         fi

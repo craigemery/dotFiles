@@ -33,7 +33,7 @@ function rpmWhich ()
 	  local temp=/tmp/rpmWhich.${$}
 	  rpm -ql ${p} | xargs -n999 \ls "-AFd${list}" ${colour} > ${temp}
 	  if fileBiggerThanScreen ${temp} ; then
-	    less -R ${temp}
+	    less ${temp}
 	  else
 	    cat ${temp}
 	  fi
