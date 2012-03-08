@@ -43,7 +43,7 @@ function __me ()
 function lr ()
 {
 # need to escape the ls command coz there's an alias that has --color=auto & it overrides the =yes
-    \ls -lAFR --color=yes "${@}" | less -R
+    \ls -lAFR --color=yes "${@}" | less
 }
 
 function ta ()
@@ -449,7 +449,7 @@ function dmo ()
     local mf="$(t5ThisDMfile)"
     if [ -f ${mf} ] ; then
         if fileBiggerThanScreen ${mf} ; then
-            fmo < ${mf} 2>&1 | less -R
+            fmo < ${mf} 2>&1 | less
         else
             fmo < ${mf} 2>&1
         fi
