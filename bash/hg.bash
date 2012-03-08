@@ -35,7 +35,17 @@ function hgneedscommit ()
 
 function hgdiff ()
 {
-    ( hgroot && ( f=/tmp/hgdiff.$$ ; hg diff $(hgmodified) > $f && gvimdiff -c 'se modified! | se guifont="Monospace 16"' - < $f 2>&- ) ) ;
+    ( hgroot && ( f=/tmp/hgdiff.$$ ; hg diff $(hgmodified) > $f ; fileBiggerThanScreen $f && out=less || out=cat ; colordiff < $f | $out ) ) ;
+}
+
+function ghgdiff ()
+{
+    ( hgroot && ( f=/tmp/ghgdiff.$$ ; hg diff $(hgmodified) > $f && gvimdiff -c 'se modified! | se guifont="Monospace 16"' - < $f 2>&- ) ) ;
+}
+
+function hgview ()
+{
+    ( hgroot && orphan hg view )
 }
 
 hgci ()
