@@ -209,6 +209,22 @@ function __wrapped_ssh ()
     ${ssh_cmd} "${ssh_opts[@]}" "${user}${hostname}${host_extra}" "${@}"
 }
 
+function _un_make_ssh_wrappers ()
+{
+    local -i verbose=0
+    [ "${1}" = -v ] && shift && verbose=1
+    readonly verbose
+    while [[ ${#} -gt 0 ]] ; do
+        local hostname=${1}
+        shift
+        local capped=${hostname}
+        __capitalise capped
+        [ ${verbose} -ne 0 ] && echo "Unmaking wrapper ${capped}"
+        eval "unset ${hostname}"
+        eval "unset ${capped}"
+    done
+}
+
 function make_ssh_wrappers ()
 {
     local -i verbose=0

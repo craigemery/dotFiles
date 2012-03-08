@@ -5,10 +5,13 @@ function make_ssh_wrappers_citrix ()
 {
     local -r cfg_file=${HOME}/.ssh/config
     if [[ -f "${cfg_file}" ]] ; then
-        make_ssh_wrappers $(awk '/^Host /{h=$2;gsub(/\*$/,"",$2);};/Hostname .*\.xensource\.com/{print h};/Hostname .*\.citrix\.com/{print h};/Hostname .*\.local/{print h}' < ${cfg_file})
+        #_un_make_ssh_wrappers "${made_ssh_wrappers_citrix[@]}"
+        made_ssh_wrappers_citrix=($(awk '/^Host /{h=$2;gsub(/\*$/,"",$2);};/Hostname .*\.xensource\.com/{print h};/Hostname .*\.citrix\.com/{print h};/Hostname .*\.local/{print h}' < ${cfg_file}))
+        make_ssh_wrappers "${made_ssh_wrappers_citrix[@]}"
     fi
 }
 
+declare -a made_ssh_wrappers_citrix=()
 make_ssh_wrappers_citrix
 
 function __site_vms ()
