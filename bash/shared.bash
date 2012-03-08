@@ -20,6 +20,11 @@ function fileBiggerThanScreen ()
     fi
 }
 
+function orphan ()
+{
+    ( "${@}" & ) >&- <&- 2>&-
+}
+
 function start ()
 {
     local cmd=$(_Pwas "${@}" 2>&-)
