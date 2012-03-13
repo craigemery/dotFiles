@@ -22,7 +22,12 @@ function fileBiggerThanScreen ()
 
 function orphan ()
 {
-    ( "${@}" & ) >&- <&- 2>&-
+    ( "${@}" & ) > /dev/null < /dev/null 2> /dev/null
+}
+
+function orphan_eval ()
+{
+    orphan eval "${@}"
 }
 
 function start ()
