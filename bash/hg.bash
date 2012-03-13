@@ -13,6 +13,11 @@ function __hgst ()
     hg st | awk '$1 ~ /^'"${1}"'$/ {print $2};' ;
 }
 
+function __hgst_count ()
+{
+    hg st | egrep -ce "^${1}\>"
+}
+
 function hgmodified ()
 {
     __hgst M
@@ -33,14 +38,44 @@ function hgneedscommit ()
     __hgst "[MAD]"
 }
 
+function hgneedscommit_count ()
+{
+    __hgst_count "[MAD]"
+}
+
+function __hgmytemp ()
+{
+    declare -r keep_hgtemp="y"
+}
+
+function __hgdo ()
+{
+    ( export hgtemp=/tmp/hg.$$ ; hgroot && "${@}" ; declare -ri ret=${?} ; if [[ -z "${keep_hgtemp}" ]] ; then rm -f "${hgtemp}" ; fi ; exit ${ret} ; )
+}
+
+function __hgdo_eval ()
+{
+    __hgdo eval "${@}"
+}
+
+function __hgdiff_eval ()
+{
+    __hgdo_eval 'hg diff $(hgmodified) > ${hgtemp} '${*}
+}
+
 function hgdiff ()
 {
-    ( hgroot && ( f=/tmp/hgdiff.$$ ; hg diff $(hgmodified) > $f ; fileBiggerThanScreen $f && out=less || out=cat ; colordiff < $f | $out ) ) ;
+    __hgdiff_eval '; fileBiggerThanScreen ${hgtemp} && out=less || out=cat ; colordiff < ${hgtemp} | $out'
+}
+
+function __gvimdiff ()
+{
+    gvim -c 'se ft=diff | se modified! | se guifont="Monospace 16"' "${@}" 2> /dev/null
 }
 
 function ghgdiff ()
 {
-    ( hgroot && ( f=/tmp/ghgdiff.$$ ; hg diff $(hgmodified) > $f && gvimdiff -c 'se modified! | se guifont="Monospace 16"' - < $f 2>&- ) ) ;
+    __hgdiff_eval '&& __hgmytemp && cat ${hgtemp} | __gvimdiff -'
 }
 
 function hgview ()
