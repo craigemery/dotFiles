@@ -1,0 +1,9 @@
+caption always # activates window caption
+caption string '%{= wk}[ %{k}%H %{k}][%= %{= wk}%?%-Lw%?%{r}(%{r}%n*%f%t%?(%u)%?%{r})%{k}%?%+Lw%?%?%= %{k}][%{b} %d/%m %{k}]'
+#caption string '%{= wk}[ %{k}%H %{k}][%= %{= wk}%?%-Lw%?%{r}(%{r}%n*%f%t%?(%u)%?%{r})%{k}%?%+Lw%?%?%= %{k}][%{b} %d/%m %{k}%c %{k}]' # good looking window bar
+
+bindkey -k k5 prev # F5 for previous window
+bindkey -k k6 next # F6 for next window
+
+shell -bash
+defscrollback 999
