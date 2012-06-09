@@ -178,7 +178,7 @@ class AutoTag:
       found = self.findTagFile(source)
       if found:
          tagsDir, tagsFile = found
-         relativeSource = source[len(tagsDir):]
+         relativeSource = os.path.splitdrive(source)[1]source[len(tagsDir):]
          if relativeSource[0] == os.sep:
             relativeSource = relativeSource[1:]
          if os.sep != self.sep_used_by_ctags:
@@ -219,7 +219,7 @@ class AutoTag:
          cmd = "%s -a " % (self.ctags_cmd,)
       for source in sources:
          if os.path.isfile(os.path.join(tagsDir, source)):
-            cmd += " '%s'" % source
+            cmd += ' "%s"' % source
       AutoTag.LOGGER.log(1, "%s: %s", tagsDir, cmd)
       do_cmd(cmd, tagsDir)
 
