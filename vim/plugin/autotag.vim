@@ -14,6 +14,12 @@ let g:autotag_vim_version_sourced=s:autotag_vim_version
 " ctags doesn't remove entries for the supplied source file that no longer exist
 " so this script (implemented in python) finds a tags file for the file vim has
 " just saved, removes all entries for that source file and *then* runs ctags -a
+"
+" You can also run :AutoTagUpdate to regenerate tags for files updated outside
+" vim (It finds a tags file for file edited in the active buffer and runs
+" ctags -f <tagsFile> -R . from directory where the tags file resides)
+" Alternatively, you can run :AutoTagUpdate <dir> to run ctags -f <tagsFile> R . 
+" in any directory
 
 if has("python")
 python << EEOOFF
@@ -160,6 +166,8 @@ class AutoTag:
                   break
                if size > AutoTag.MAXTAGSFILESIZE:
                   LOGGER.info("Ignoring too big tags file %s", tagsFile)
+                  vim.command("echohl ErrorMsg | echo 'autotag: Ignoring "\
+                              "too big tags file %s'| echohl None" % tagsFile )
                   break
             ret = (file, tagsFile)
             break
@@ -236,6 +244,40 @@ class AutoTag:
    def rebuildTagFiles(self):
       for ((tagsDir, tagsFile), sources) in self.tags.items():
          self.updateTagsFile(tagsDir, tagsFile, sources)
+
+   def regenerateTagsFile(self, source, traverse=True):
+      if not os.path.isdir(source):
+         vim.command("echoerr 'Argument is not a directory: %s'" % source)
+         return
+      if not traverse and not os.path.exists( os.path.join(source,self.tags_file) ):
+         # ask if to create tags_file
+         choice = vim.eval(' confirm("No tags file in directory: %s Create?",'\
+                           '"&Yes\n&No",2)' % source )
+         if choice != "1":
+            vim.command("echo 'Aborting.'")
+            return
+         else:
+            try:
+               f = open( os.path.join(source,self.tags_file), 'w' )
+               f.close()
+            except:
+               vim.command("echoerr 'File could not be created.'")
+               return
+      # source is a directory, let's append an arbitrary name
+      # so we can use findTagFile which is designed to work with a file as an argument
+      source = os.path.join(source,"placeholder")
+      found = self.findTagFile(source)
+      if found:
+         tagsDir, tagsFile = found
+      else:
+         return
+      if self.tags_file:
+         cmd = "%s -f %s -R ." % (self.ctags_cmd, self.tags_file)
+      else:
+         cmd = "%s -a -R ." % (self.ctags_cmd, )
+      LOGGER.log(1, "%s: %s", tagsDir, cmd)
+      for l in do_cmd(cmd, tagsDir):
+         LOGGER.log(10, l)
 EEOOFF
 
 function! AutoTag()
@@ -261,6 +303,37 @@ function! AutoTagDebug()
    setlocal noswapfile
    normal 
 endfunction
+
+function! AutoTagUpdate(...)
+   if a:0 == 0
+      let dest_dir=expand("%:p:h")
+      let traverse = 1
+   elseif a:0 == 1
+      let dest_dir=a:1
+      let traverse = 0
+   else
+      echoerr "AutoTagUpdate takes 0 or 1 arguments"
+      return
+   endif
+   if type(dest_dir) != 1 || !strlen(dest_dir)
+      " we cant determine which tags file should be updated
+      echoerr "No file opened and no path specified - nothing to update: " . dest_dir
+      return
+   endif
+python << EEOOFF
+try:
+   if not vim_global("Disabled", bool):
+      at = AutoTag()
+      if vim.eval("traverse") == "1":
+         at.regenerateTagsFile(vim.eval('dest_dir'),traverse=True)
+      else:
+         at.regenerateTagsFile(vim.eval('dest_dir'),traverse=False)
+except:
+   logging.warning(format_exc())
+EEOOFF
+endfunction
+
+command! -nargs=? -complete=dir AutoTagUpdate call AutoTagUpdate(<f-args>)
 
 augroup autotag
    au!
