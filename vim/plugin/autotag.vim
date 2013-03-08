@@ -168,7 +168,7 @@ class AutoTag:
             open(tagsFile, 'wb').close()
             ret = (file, tagsFile)
             break
-         elif not file or file == os.sep or file == "//" or file == "\\\\":
+         elif not file or set(file).issubset(set((os.sep, "/", "\\"))):
             LOGGER.info('bail (file = "%s")' % (file, ))
             break
       return ret
