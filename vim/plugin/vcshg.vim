@@ -270,4 +270,50 @@ let s:hgFunctions.AnnotateSplitRegex = '\d\+: '
 " Section: Plugin Registration {{{1
 let s:VCSCommandUtility = VCSCommandRegisterModule('HG', expand('<sfile>'), s:hgFunctions, [])
 
+" Function: s:Push(argList) {{{2
+function! s:Push()
+	return s:DoCommand('push', 'push', '', {})
+endfunction
+
+" Function: s:Update(argList) {{{2
+function! s:Update()
+	return s:DoCommand('update', 'update', '', {})
+endfunction
+
+" Function: s:Pull(argList) {{{2
+function! s:Pull(...)
+        if len(a:000) == 0
+            let arg = ''
+        else
+            let arg = a:0
+        endif
+	"return s:DoCommand('pull', 'pull', arg, {})
+endfunction
+
+com! HgPush call s:Push()
+com! HgUpdate call s:Update()
+com! HgPull call s:Pull()
+com! HgPullUp call s:Pull('-u')
+
+let mappingInfo = [
+			\['HgPush', 'HgPush'],
+			\['HgUpdate', 'HgUpdate'],
+			\['HgPull', 'HgPull'],
+			\['HgPullUp', 'HgPullUp']
+			\]
+
+for [pluginName, commandText] in mappingInfo
+	execute 'nnoremap <silent> <Plug>' . pluginName . ' :' . commandText . '<CR>'
+endfor
+
+" Section: Menu items {{{1
+for [s:shortcut, s:command] in [
+			\['Hg.&Push', '<Plug>HgPush'],
+			\['Hg.&Update', '<Plug>HgUpdate'],
+			\['Hg.Pu&ll', '<Plug>HgPull'],
+			\]
+	call s:VCSCommandUtility.addMenuItem(s:shortcut, s:command)
+endfor
+unlet s:shortcut s:command
+
 let &cpo = s:save_cpo

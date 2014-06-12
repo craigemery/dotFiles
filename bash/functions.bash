@@ -532,6 +532,9 @@ function __FI ()
     local -r PFlag="-P"
     local -r vFlag="-v"
     local -r vLongFlag="--vim-regex"
+    local -r sudoLongFlag="-sudo"
+    local sudo_flag=""
+    local sudo=""
     local useVimRegExp=""
     local pruneless=""
 
@@ -588,6 +591,10 @@ function __FI ()
         ${vFlag}|${vLongFlag})
             useVimRegExp=yes
         ;;
+        ${sudoLongFlag})
+            sudo_flag=${sudoLongFlag}
+            sudo=sudo
+        ;;
         ${sFlag}|${sLongFlag})
             noerrors="2> /dev/null"
         ;;
@@ -595,7 +602,7 @@ function __FI ()
         -*)
             local RESULT ; __funcname_entry 2
             echo "Invalid argument: ${1}" >&2
-            echo -ne "usage:\t${RESULT} [[${aFlag} N|${aLongFlag}=N] [${BFlag} N|${BLongFlag}=N] ${caseFlag} ${numbersFlag}] [${ignoreBinaryFlag}|${ignoreBinaryLongFlag}] [${wFlag}|${wLongFlag}] [${cFlag}|${cLongFlagUK}|${cLongFlagUS}] [${bFlag}|${bLongFlag}] [${PFlag}] [-l|--list] " >&2
+            echo -ne "usage:\t${RESULT} [${sudoLongFlag}] [[${aFlag} N|${aLongFlag}=N] [${BFlag} N|${BLongFlag}=N] ${caseFlag} ${numbersFlag}] [${ignoreBinaryFlag}|${ignoreBinaryLongFlag}] [${wFlag}|${wLongFlag}] [${cFlag}|${cLongFlagUK}|${cLongFlagUS}] [${bFlag}|${bLongFlag}] [${PFlag}] [-l|--list] " >&2
             echo "[<directory>] <regular expression>" >&2
             error="yes"
             break
@@ -649,9 +656,9 @@ function __FI ()
         unset RESULT
 
         if [[ "${less}" ]] ; then
-            ${findCmdName} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} -B ${before} -A ${after} ${colour} ${listonly} "${patterns[@]}" | less -fR
+            ${findCmdName} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} -B ${before} -A ${after} ${colour} ${listonly} "${patterns[@]}" | less -fR
         else
-            ${findCmdName} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} -B ${before} -A ${after} ${colour} ${listonly} "${patterns[@]}"
+            ${findCmdName} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} -B ${before} -A ${after} ${colour} ${listonly} "${patterns[@]}"
         fi
 
     fi
@@ -715,7 +722,7 @@ function __findDefaultExcludes ()
 {
     # assume local -a RESULT
     __readRC .FIexcludes
-    __not_named tags '*.log' '.sw?' '.*.sw?' .DS_Store "${RESULT[@]}"
+    __not_named tags '*.log' '.sw?' '.*.sw?' .DS_Store '*.py[co]' '*.orig' "${RESULT[@]}"
 }
 
 function __findDefaultPrunes ()
@@ -726,6 +733,7 @@ function __findDefaultPrunes ()
 
 function findFiles ()
 {
+    local sudo=""
     local print="-print"
     local -a RESULT
     __findDefaultExcludes
@@ -735,6 +743,9 @@ function findFiles ()
     unset RESULT
     while [[ ${#} -gt 0 ]] ; do
         case "${1}" in
+        -sudo)
+            local sudo=sudo
+        ;;
         -ls)
             local print="-ls"
         ;;
@@ -775,7 +786,7 @@ function findFiles ()
     else
         local -r -a pruning=()
     fi
-    find "${@}" "${pruning[@]}" \( -type f ${newer} "${excludes[@]}" ${print} \)
+    ${sudo} find "${@}" "${pruning[@]}" \( -type f ${newer} "${excludes[@]}" ${print} \)
 }
 
 function FI ()
@@ -804,6 +815,7 @@ function findNamed ()
 {
     #assume local -a RESULT
     #though weirdly RESULT is being used to pass in some parameters
+    local sudo=""
     local -r -a named=("${RESULT[@]}")
     unset RESULT
     local -a names=()
@@ -817,8 +829,17 @@ function findNamed ()
     #if [[ ${#} -eq 1 && ! "${1}" =~ "^-.*" ]] ; then
         #set -- -n "${1}"
     #fi
+    local -a types=( -type f )
     while [[ ${#} -gt 0 ]] ; do
         case "${1}" in
+        -d|-dirs)
+            types[${#types[@]}]="-o"
+            types[${#types[@]}]="-type"
+            types[${#types[@]}]="d"
+        ;;
+        -sudo)
+            local sudo=sudo
+        ;;
         -ls)
             local print="-ls"
         ;;
@@ -838,6 +859,8 @@ function findNamed ()
         -p) prune_dirs[${#prune_dirs[@]}]="${2}"
             shift
         ;;
+        -xdev) local xdev=-xdev ;;
+        -P) local sym_links=-P ;;
         -N|-n) [[ ${#names[@]} -gt 0 ]] && names[${#names[@]}]="-o"
             case "${1}" in
             -n) local finder="-name" ;;
@@ -867,7 +890,7 @@ function findNamed ()
     else
         local -r -a pruning=()
     fi
-    find "${@}" "${pruning[@]}" \( -type f ${newer} "${excludes[@]}" \( "${named[@]}"  "${names[@]}" \) ${print} \)
+    ${sudo} find "${@}" ${xdev} ${sym_links} "${pruning[@]}" \( \( ${types[@]} \) ${newer} "${excludes[@]}" \( "${named[@]}"  "${names[@]}" \) ${print} \)
 }
 
 # This needs fixing on the bloody =~ expression that either is broken or I don't get!!!!
@@ -1006,9 +1029,64 @@ function FIMarkup ()
     __FI findMarkup "${@}"
 }
 
+function __xargs ()
+{
+    while read word ; do
+        trace "${@}" ${w}
+    done
+}
+
+function __mkFindRm ()
+{
+    local capname="${1}" ; shift
+    __capitalise capname
+    local -a flags="${@}"
+    eval "function find${capname} () { findNamed ${*} ; }"
+    eval "function rm${capname} () { find${capname} | __xargs rm ; }"
+}
+
 function findSwaps ()
 {
     findNamed -X -n '.sw?' -n '.*.sw?'
+}
+
+function rmSwaps ()
+{
+    findSwaps "${@}" | xargs -rtn1 rm
+}
+
+#__mkFindRm TempPy -n '*.py[co]'
+
+function findPy ()
+{
+    local f
+    findFiles "${@}" | while read f ; do
+        case "${f}" in
+        *.py) echo "${f}" ;;
+        *)
+            case "$(file $f)" in
+            *python*byte-compiled*) ;;
+            *python*) echo ${f} ;;
+            esac
+        ;;
+        esac
+    done
+}
+
+function findTempPy ()
+{
+    local f
+    findPy "${@}" | while read f ; do
+        local s
+        for s in o c .orig ; do
+            [[ -f "${f}${s}" ]] && echo "${f}${s}"
+        done
+    done
+}
+
+function rmTempPy ()
+{
+    findTempPy "${@}" | xargs -rtn1 rm
 }
 
 function mrun ()
@@ -1226,6 +1304,18 @@ function Sleep ()
         read -t 1 -p .
         seconds=$((${seconds}-1))
     done
+}
+
+function column_add ()
+{
+    awk 'BEGIN{t=0};//{t+=$'"${1}"'};END{print t}'
+}
+
+function comment_line ()
+{
+    local -ri n=${1}
+    local -r fname="${2}"
+    sed -ie "$n,$n s@^@#@" ${fname}
 }
 
 # vim:sw=4:ts=4

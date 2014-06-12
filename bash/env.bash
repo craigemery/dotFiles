@@ -48,6 +48,7 @@ function ntty ()
     tty | sed -e 's/\/dev\///'
 }
 
+if [[ -z "$(declare -f _powerline_prompt)" ]] ; then
 xtermTitle '${USER}@${HOSTNAME%%.*}:$(ntty):cwd=$(npwd)'
 rxvtTitle '$(ntty):$(npwd)'
 
@@ -70,6 +71,7 @@ case $TERM in
 esac
 
 PS1="${PS1}\[$(colour fg blue 2>&-)\]\t \[$(colour fg red 2>&-)\]\$\[$(colour reset 2>&-)\] "
+fi
 
 # . ads.profile
 

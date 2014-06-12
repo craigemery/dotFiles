@@ -33,7 +33,7 @@ endfunction
 "map <F4> :mak %<.o<CR>
 "map <F4> :call Craig_compile()<CR>
 "map <F5> :cd .<CR>:mak depend<CR>:mak build/ipaq_linux/obj/%<.o<CR>
-map <F6> :cd .<CR>:mak %<.o<CR>
+"map <F6> :cd .<CR>:mak %<.o<CR>
 
 function! CompileT2Linux ()
     cd .

@@ -28,6 +28,8 @@ autocmd BufNewFile,BufRead *.lnt set ft=cpp
 autocmd BufNewFile,BufRead,BufEnter *.py call Enter_python ()
 autocmd BufNewFile,BufRead,BufEnter * call OnlyRubyHasQueryEtc ()
 autocmd BufLeave,BufNew * call Leaving()
+autocmd FileType python compiler pylint
+"autocmd FileType python compiler pep8
 augroup end
 
 function! Enter_makefile()
@@ -63,6 +65,8 @@ endfunction
 function! Enter_python()
   if &ft == 'python'
     set shiftwidth=4
+    compiler pylint
+"   compiler pep8
   endif
 endfunction
 

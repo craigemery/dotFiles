@@ -4,7 +4,13 @@
 "call InitPerforce()
 "endif
 
+filetype off
+set rtp^=~/.dotFiles/vim/bundle/vundle
+call vundle#rc()
+Bundle 'gmarik/vundle'
+"Bundle 'bling/vim-bufferline'
 filetype plugin on
+filetype plugin indent on
 
 let Tlist_Show_Menu=1
 if has("win32")
@@ -22,6 +28,8 @@ set wildignore+=*.pyc
 set wildignore+=*.o
 set incsearch
 set makeprg=gmake
+set colorcolumn=100
+set mouse=a
 let g:netrw_cygwin=1
 
 if !exists("path_grown")
@@ -61,6 +69,8 @@ if &term =~ "xterm"
     set t_Sf=[3%dm
     set t_Sb=[4%dm
   endif
+elseif &term =~ "screen"
+  set noicon
 endif
 
 syntax enable
@@ -220,6 +230,7 @@ endfunction
 map <Leader>n :call Toggle_num()<CR>
 
 set runtimepath^=$HOME/.dotFiles/vim
+set rtp+=~/.dotFiles/powerline/powerline/bindings/vim
 
 runtime search.vim
 runtime build.vim

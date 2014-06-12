@@ -39,4 +39,11 @@ function! FindDirUpTree (name)
    return FindUpTreeFrom(a:name, expand ("%:p:h"))
 endfunction
 
+function! FindHgRoot ()
+   let root = FindUpTreeFrom("/.hg", expand ("%:p:h"))
+   if isdirectory (root)
+      exec "silent lcd " . fnamemodify (root, ":h")
+   endif
+endfunction
+
 " vim:shiftwidth=4:ts=4

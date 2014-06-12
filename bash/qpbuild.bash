@@ -44,7 +44,7 @@ function t5QpbIsInvalidProduct ()
     return 1
 }
 
-function t5QpbFindArgAfterSpecificArg ()
+function findArgAfterSpecificArg ()
 {
     if [[ -z "${__faasa_dbg}" ]] ; then
         local -r __faasa_dbg=null
@@ -90,7 +90,7 @@ function qpb ()
         let idx=--idx
         local RESULT=""
       # If there is no -P <something>
-        #if ! t5QpbFindArgAfterSpecificArg -P "${args[@]}" ; then
+        #if ! findArgAfterSpecificArg -P "${args[@]}" ; then
           # and the last argument is NOT a valid product
             #if t5QpbIsInvalidProduct ${args[${idx}]} ; then
               # then add the default product to the command
@@ -139,17 +139,17 @@ function getPBV()
 {
     local RESULT=""
     local -a args=("${@}")
-    if t5QpbFindArgAfterSpecificArg -V "${args[@]}" ; then
+    if findArgAfterSpecificArg -V "${args[@]}" ; then
         variant="${RESULT}"
     else
         variant="ALL"
     fi
-    if t5QpbFindArgAfterSpecificArg -b "${args[@]}" ; then
+    if findArgAfterSpecificArg -b "${args[@]}" ; then
         branch=$(echo "${RESULT}" | tr '[a-z]' '[A-Z]')
     else
         branch=HEAD
     fi
-    if t5QpbFindArgAfterSpecificArg -P "${args[@]}" ; then
+    if findArgAfterSpecificArg -P "${args[@]}" ; then
         product="${RESULT}"
     else
         local -i idx=${#args[@]}
@@ -247,11 +247,11 @@ function t5CompleteQpbuild ()
     if [[ "${previous_word}" = "-V" ]] ; then
         local RESULT=""
         COMPREPLY=()
-        t5QpbFindArgAfterSpecificArg -P "${COMP_WORDS[@]}"
+        findArgAfterSpecificArg -P "${COMP_WORDS[@]}"
         if [[ "${RESULT}" ]] ; then
             local -r product="${RESULT}"
             RESULT=""
-            t5QpbFindArgAfterSpecificArg -b "${COMP_WORDS[@]}"
+            findArgAfterSpecificArg -b "${COMP_WORDS[@]}"
             if [[ "${RESULT}" ]] ; then
                 local -r branch="${RESULT}"
             else
@@ -388,17 +388,17 @@ function qpg ()
         fi
 #       echo '${args[@]} = '"'${args[@]}'" >> /dev/${__qpg_dbg}
         local RESULT=""
-        if t5QpbFindArgAfterSpecificArg -V "${args[@]}" ; then
+        if findArgAfterSpecificArg -V "${args[@]}" ; then
             local -r variant="${RESULT}"
         else
             local -r variant="ALL"
         fi
-        if t5QpbFindArgAfterSpecificArg -b "${args[@]}" ; then
+        if findArgAfterSpecificArg -b "${args[@]}" ; then
             local -r branch=$(echo "${RESULT}" | tr '[a-z]' '[A-Z]')
         else
             local -r branch=HEAD
         fi
-        if t5QpbFindArgAfterSpecificArg -P "${args[@]}" ; then
+        if findArgAfterSpecificArg -P "${args[@]}" ; then
             local -r product="${RESULT}"
         else
             local -i idx=${#args[@]}

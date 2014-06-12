@@ -16,7 +16,7 @@ function fileBiggerThanScreen ()
         local -r -i bigrows=$(( ${rows} + 1 ))
         local -r -i lines=$((0 + $(head -${bigrows} < "${file}" | fold -${columns} | wc -l) ))
 
-        [[ ${lines} -gt ${rows} ]] && return 0 || return 1
+        [[ ${lines} -ge ${rows} ]] && return 0 || return 1
     fi
 }
 
@@ -39,6 +39,11 @@ function start ()
     cmd /c 'start '"${cmd}"
 }
 
+function HgST ()
+{
+    __nt "Hg status" hgST
+}
+
 function Man ()
 {
     __nt -/ "man $*" man "${@}"
@@ -59,12 +64,22 @@ function Xdu ()
     __nt -p xdu ${HOME}/dist/bin/xdiskusage
 }
 
+function Sudo ()
+{
+    __nt sudo sudo "${@}"
+}
+
+function Xenhg ()
+{
+    __nt xenhg sudo su - xenhg
+}
+
 function __term_type ()
 {
     #assume local RESULT
     case "${TERM}" in
     xterm*) RESULT=xterm ;;
-    screen*) RESULT=screen ;;
+    screen*) if [[ "$TMUX" ]] ; then RESULT=tmux ; else RESULT=screen ; fi ;;
     rxvt*) RESULT=rxvt ;;
     *) RESULT="" ;;
     esac
@@ -78,6 +93,7 @@ function __nt () {
         case "${1}" in
         -p) runner="${HOME}/dist/shell/pauseAfter" ;;
         -P) runner="${HOME}/dist/shell/pauseOnError" ;;
+        -w) runner="watch" ;;
         -/) pd="/" ;;
         -*) ;;
         *) break ;;
@@ -94,7 +110,14 @@ function __nt () {
     case "${RESULT}" in
     xterm) ( xterm -title "${name}" -geometry 86x50 -e bash -c '${command} '"${*}"'' & <&- >&- ) ;;
     screen) screen -t "${name}" bash -ic ". ~/.dotFiles/bash/bootstrap.bash ; titles both '${name}' ; exec ${runner} ${command} ${*}" ;;
-    rxvt) newTabDo ${runner} ${command} "${@}" ;;
+    rxvt) mrxvtTabDo ${runner} ${command} "${@}" ;;
+    tmux)
+        case "${command}" in
+            vim) tmux split-window -h "${runner} ${command} -X ${*}" ;;
+            hgST) tmux split-window -h "${runner} ${command} ${*}" ;;
+            *) tmux new-window -n "${name}" "${runner} ${command} ${*}" ;;
+        esac
+    ;;
     *) ${command} "${@}" ;;
     esac
     unset RESULT

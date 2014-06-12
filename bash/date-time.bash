@@ -94,6 +94,20 @@ function secondsSinceEpoch ()
     echo ${RESULT}
 }
 
+function __startOfDay ()
+{
+    # assume local -i RESULT seconds since epoch of time in question
+    RESULT=$((${RESULT} - (${RESULT} % (60 * 60 * 24) ) ))
+}
+
+function startOfToday ()
+{
+    local -i RESULT
+    __secondsSinceEpoch
+    __startOfDay
+    echo ${RESULT}
+}
+
 function timeFromSecondsSinceEpoch ()
 {
     local -r -i sse=${1}

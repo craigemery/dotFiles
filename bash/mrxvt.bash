@@ -10,7 +10,7 @@ function _mrxvtCmd ()
    fi
 }
 
-function newTab ()
+function mrxvtTab ()
 {
    if [[ ${#} -gt 0 ]] ; then
       _mrxvtCmd "NewTab ${@}"
@@ -19,12 +19,19 @@ function newTab ()
    fi
 }
 
-function newTabDo ()
+function mrxvtTabDo ()
 {
     if [[ "${MRXVT_TABTITLE}" ]] ; then
-        newTab "${@}"
+        mrxvtTab "${@}"
     else
         "${@}"
     fi
 }
 
+unset newTab
+unset newTabDo
+
+function __mrxvt ()
+{
+    . mrxvt.bash
+}

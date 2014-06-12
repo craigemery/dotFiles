@@ -261,6 +261,14 @@ function rscreen ()
     trace ssh -t "${host}" ${sudo} /opt/bin/screen "${@}"
 }
 
+function offending_key ()
+{
+    local -r line="${1}"
+    local -r kh="${line%:*}"
+    local -ri n=${line##*:}
+    comment_line $n $kh
+}
+
 function __ssh ()
 {
    . ssh.bash
