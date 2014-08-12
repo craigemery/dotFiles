@@ -1,3 +1,4 @@
+--excmd=number
 --extra=+f+q
 --c-types=+p
 --langmap=make:+.mk
