@@ -91,12 +91,16 @@ endfunction
 function! s:hgFunctions.Identify(buffer)
 	let oldCwd = VCSCommandChangeToCurrentFileDir(resolve(bufname(a:buffer)))
 	try
-		call s:VCSCommandUtility.system(s:Executable() . ' root')
-		if(v:shell_error)
-			return 0
-		else
-			return g:VCSCOMMAND_IDENTIFY_INEXACT
-		endif
+                if (isdirectory('.hg'))
+                        call s:VCSCommandUtility.system(s:Executable() . ' root')
+                        if(v:shell_error)
+                                return 0
+                        else
+                                return g:VCSCOMMAND_IDENTIFY_INEXACT
+                        endif
+                else
+                        return 0
+                endif
 	finally
 		call VCSCommandChdir(oldCwd)
 	endtry
