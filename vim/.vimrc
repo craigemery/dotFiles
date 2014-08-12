@@ -74,7 +74,8 @@ elseif &term =~ "screen"
 endif
 
 syntax enable
-colorscheme pablo
+"colorscheme pablo
+colorscheme koehler
 "set background=dark
 "highlight Normal guifg=#e0e0ff guibg=#404040
 
@@ -96,7 +97,7 @@ set keywordprg=Man
 
 map <F2> :next<CR>
 map <C-F2> :prev<CR>
-map <F3> :update<CR>:chdir .<CR><C-G>
+map <F3> :update<CR>
 map <M-F3> :w!<CR>:chdir .<CR><C-G>
 "map <S-F3> :wa<CR>:chdir .<CR><C-G>
 map <S-F3> :tabnew<CR>:bufdo! update<CR>:tabclose<CR>

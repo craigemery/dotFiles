@@ -48,4 +48,3 @@ set lines=50
 set columns=165
 "set lines=44
 "set columns=126
-colorscheme koehler
