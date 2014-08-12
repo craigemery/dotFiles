@@ -6,3 +6,4 @@ if ! shopt -q login_shell ; then
 fi
 . ~/.dotFiles/bash/bootstrap.bash
 alias 'll=ls --color=auto -lAF'
+. dropbox.bash
