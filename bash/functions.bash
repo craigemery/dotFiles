@@ -1,6 +1,6 @@
 #! /bin/bash
 
-. cvs.bash
+#. cvs.bash
 . tags.bash
 . strings.bash
 . ssh.bash
@@ -501,8 +501,8 @@ function __FI ()
     local ignoreBinary=""
     local noerrors=""
     local less=""
-    local -i before=0
-    local -i after=0
+    local before=()
+    local after=()
     local -r caseFlag="-i"
     local -r numbersFlag="-n"
     local -r wFlag="-w"
@@ -541,18 +541,18 @@ function __FI ()
     while [[ ${#} -gt 0 ]] ; do
         case "${1}" in
         ${aFlag})
+            after=(${1} ${2})
             shift
-            after=${1}
         ;;
         ${aLongFlag}=)
-            after=${1#${aLongFlag}=}
+            after=(${aFlag} ${1#${aLongFlag}=})
         ;;
         ${BFlag})
+            before=(${1} ${2})
             shift
-            before=${1}
         ;;
         ${BLongFlag}=)
-            before=${1#${BLongFlag}=}
+            before=(${BFlag} ${1#${BLongFlag}=})
         ;;
         ${cFlag}|${cLongFlagUK}|${cLongFlagUS})
             colour="${cLongFlagUS}"
@@ -656,9 +656,9 @@ function __FI ()
         unset RESULT
 
         if [[ "${less}" ]] ; then
-            ${findCmdName} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} -B ${before} -A ${after} ${colour} ${listonly} "${patterns[@]}" | less -fR
+            ${findCmdName} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} "${before[@]}" "${after[@]}" ${colour} ${listonly} "${patterns[@]}" | less -fR
         else
-            ${findCmdName} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} -B ${before} -A ${after} ${colour} ${listonly} "${patterns[@]}"
+            ${findCmdName} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} "${before[@]}" "${after[@]}" ${colour} ${listonly} "${patterns[@]}"
         fi
 
     fi
