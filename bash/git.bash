@@ -9,10 +9,29 @@ function gitroot ()
     test -d .git
 }
 
+function __gitrealpath ()
+{
+    ( gitroot ; xargs -n1 -r readlink -f )
+}
+
+function __gitrelpath ()
+{
+    __gitrealpath | sed -e "s@^$(readlink -f .)/@@"
+}
+
+
 function __gitst ()
 {
     local -r q="${1}" ; shift
-    git status --short "${@}" | sed -ne "s/^${q} //p"
+    local post=cat
+    if [[ "${1}" = "-c" ]] ; then
+        shift
+        post="wc -l"
+    elif [[ "${1}" = "-r" ]] ; then
+        shift
+        post="__gitrealpath"
+    fi
+    git status --short "${@}" | sed -ne "s/^${q} //p" | ${post}
 }
 
 function __gitst_count ()
@@ -53,12 +72,12 @@ function gitmissing ()
 
 function gitneedscommit ()
 {
-    __gitst "[MADR]" "${@}"
+    __gitst ".[MADR]" "${@}"
 }
 
 function gitneedscommit_count ()
 {
-    __gitst_count "[MADR]" "${@}"
+    gitneedscommit "${@}" | wc -l
 }
 
 function __gitmytemp ()
@@ -90,6 +109,63 @@ function __gitdiff_eval ()
 function gitdiff ()
 {
     __gitdiff_eval $1 '; fileBiggerThanScreen ${gittemp} && out=less || out=cat ; colordiff < ${gittemp} | $out'
+}
+
+function gitup ()
+{
+    ( gitroot && git pull )
+}
+
+function gitview ()
+{
+    ( gitroot && orphan qgit )
+}
+
+function gitci ()
+{
+    local push=no
+    local echo=trace
+    local auto=""
+    local dry=""
+    local add=(true)
+    while [[ $# -gt 0 ]] ; do
+        case "${1}" in
+        -*)
+            case "${1}" in
+            -p|--push) push=yes ;;
+            -d|--dry) echo=diag ; dry="--dry-run" ;;
+            -h|-\?|--help) echo "Usage gitci [-p|--push] file... [--] comment" >&2 ; return ;;
+            *) echo "Invalid switch" >&2 ; return ;;
+            esac
+            shift
+        ;;
+        *) break ;;
+        esac
+    done
+    if [[ $(gitneedscommit_count) -gt 0 ]] ; then
+        local -a files=()
+        while [[ $# -gt 0 ]] ; do
+            if [[ "${1}" == "--" ]] ; then
+                break
+            elif [[ -f "${1}" ]] ; then
+                files[${#files[@]}]="${1}"
+            elif [[ -d "${1}" ]] ; then
+                files[${#files[@]}]="${1}"
+            else
+                break
+            fi
+            shift
+        done
+        if [[ ${#files[@]} -eq 0 ]] ; then
+            auto="a"
+        else
+            add=( ${echo} git add "${files[@]}" )
+        fi
+        local -r msg="${*}"
+        ( ${echo} git pull && ${add[@]} && trace git commit ${dry} -${auto}m "${msg}" "${files[@]}" && [[ ${push} == yes ]] && ${echo} git push )
+    else
+        echo "Nothing modified" >&2
+    fi
 }
 
 function __git ()

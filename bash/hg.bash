@@ -9,16 +9,33 @@ function hgroot ()
     test -d .hg
 }
 
+function __hgrealpath ()
+{
+    ( hgroot ; xargs -n1 -r readlink -f )
+}
+
+function __hgrelpath ()
+{
+    __hgrealpath | sed -e "s@^$(readlink -f .)/@@"
+}
+
 function __hgst ()
 {
     local -r q="${1}" ; shift
+    local post=cat
     if [[ "${1}" = "-c" ]] ; then
         shift
         awk='{count+=1;};END{print count;};'
+    elif [[ "${1}" = "-r" ]] ; then
+        shift
+        post="__hgrealpath"
+    elif [[ "${1}" = "-R" ]] ; then
+        shift
+        post="__hgrelpath"
     else
         awk='{print $2};'
     fi
-    hg st "${@}" | awk 'BEGIN{count=0}; $1 ~ /^'"${q}"'$/ '"${awk}" ;
+    hg st "${@}" | awk 'BEGIN{count=0}; $1 ~ /^'"${q}"'$/ '"${awk}" | ${post} ;
 }
 
 function __hgst_count ()
@@ -116,7 +133,7 @@ function ghgdiff ()
 
 function hgview ()
 {
-    ( hgroot ${1} && orphan /usr/bin/hgview )
+    ( hgroot ${1} && test -d .hg && orphan hg view || fail -1 $PWD not an Hg repository )
 }
 
 hgci ()
@@ -225,6 +242,42 @@ function findOrigFiles ()
 function rmOrigFiles ()
 {
     findOrigFiles | xargs -rtn1 rm
+}
+
+function hgmerge ()
+{
+	set -x
+	local -r url_base="http://hg.uk.xensource.com/carbon"
+	local -r prod="${1}"
+	shift
+	local -r change="${1}"
+	shift
+	local -r src="trunk/${prod}"
+	local -r dest="cowley/${prod}"
+	[[ -d "${src}" ]] || ( cd ${src%/*} && hg clone "${url_base}/${src}" )
+	[[ -d "${dest}" ]] || ( cd ${dest%/*} && hg clone "${url_base}/${dest}" )
+	local -x -r seat=${PWD}
+	pushd ${src}
+	hg export ${change} | ( cd ${seat}/${dest} && hg import --no-commit - )
+	popd
+	set +x
+}
+
+function hglog ()
+{
+    local -r tmp=$(mktemp)
+    hg log "${@}" | source-highlight -s diff -f esc > ${tmp}
+    if fileBiggerThanScreen ${tmp} ; then
+        less -R '+/^diff -r .* -r .*' ${tmp}
+    else
+        cat ${tmp}
+    fi
+    rm -f ${tmp}
+}
+
+function hgup ()
+{
+    ( hgroot && hg pull -u )
 }
 
 function __hg ()
