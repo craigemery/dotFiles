@@ -85,13 +85,36 @@ function! s:DoCommand(cmd, cmdName, statusText, options)
 	endif
 endfunction
 
+function! s:FindUpTreeFrom (name, startDir)
+   let oldcwd = getcwd()
+   exec "silent lcd " . a:startDir
+   let old_dir = ""
+   let dir = getcwd()
+   let path = dir . a:name
+   while ! filereadable (path) && ! isdirectory (path) && dir != old_dir
+      lcd ..
+      let old_dir = dir
+      let dir = getcwd()
+      let path = dir . a:name
+   endwhile
+   lcd .
+   if filereadable (path) || isdirectory (path)
+      let ret = path
+   else
+      let ret = ""
+   endif
+   exec "silent lcd " . oldcwd
+   return ret
+endfunction
+
 " Section: VCS function implementations {{{1
 
 " Function: s:hgFunctions.Identify(buffer) {{{2
 function! s:hgFunctions.Identify(buffer)
 	let oldCwd = VCSCommandChangeToCurrentFileDir(resolve(bufname(a:buffer)))
 	try
-                if (isdirectory('.hg'))
+                
+                if (isdirectory (s:FindUpTreeFrom("/.hg", expand ("%:p:h"))))
                         call s:VCSCommandUtility.system(s:Executable() . ' root')
                         if(v:shell_error)
                                 return 0

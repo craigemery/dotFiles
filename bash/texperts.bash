@@ -2,7 +2,7 @@
 
 . svn.bash
 . functions.bash
-. xterm.bash
+[[ ${BASH_VERSINFO[0]} -gt 3 ]] && . xterm.bash
 . macos.bash
 . date-time.bash
 . lists.bash

@@ -1,7 +1,7 @@
 #! /bin/bash
 
 . lists.bash
-. xterm.bash
+[[ ${BASH_VERSINFO[0]} -gt 3 ]] && . xterm.bash
 . date-time.bash
 . dir.bash
 #. cheyenne.bash
@@ -9,6 +9,7 @@
 #. qpbuild.bash
 . functions.bash
 . env.bash
+. tmux.bash
 
 prependToPath .
 me=${0##*/}

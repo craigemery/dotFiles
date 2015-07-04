@@ -11,6 +11,9 @@ if [ -n "$(which tmux 2>/dev/null)" ]; then
     function tmux() {
         local tmux=$(type -fp tmux)
         case "$1" in
+            vim)
+                $tmux split-window -p 10 vim ; $tmux rotate-window ; $tmux select-pane -U
+                ;;
             reorder-windows|reorder|defrag)
                 local i=$(tmux show-option -g |awk '/^base-index/ {print $2}')
                 local w
@@ -41,3 +44,8 @@ if [ -n "$(which tmux 2>/dev/null)" ]; then
         esac
     }
 fi
+
+function __tmux ()
+{
+    . tmux.bash
+}

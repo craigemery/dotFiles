@@ -43,7 +43,18 @@ function! FindHgRoot ()
    let root = FindUpTreeFrom("/.hg", expand ("%:p:h"))
    if isdirectory (root)
       exec "silent lcd " . fnamemodify (root, ":h")
+      return 1
    endif
+   return 0
+endfunction
+
+function! FindGitRoot ()
+   let root = FindUpTreeFrom("/.git", expand ("%:p:h"))
+   if isdirectory (root)
+      exec "silent lcd " . fnamemodify (root, ":h")
+      return 1
+   endif
+  return 0
 endfunction
 
 " vim:shiftwidth=4:ts=4

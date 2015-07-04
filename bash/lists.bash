@@ -1,146 +1,284 @@
 #!/bin/bash
 
-function prependToPath ()
+function prependTo ()
 {
+    local -r var_name="${1}" ; shift
+    local remove=""
     if [[ "${1}" = -m ]] ; then
         shift
-        removeFromPath "${1}"
+        remove=y
     fi
-    case ":${PATH}:" in
-    *:${1}|${1}:*|*:${1}:*) ;;
-    *)
-        # echo "Prepending '${1}' to PATH"
-        export PATH=${1}:${PATH}
-    ;;
-    esac
+    while [[ $# -gt 0 ]] ; do
+        local -a list="${!var_name}"
+        if [[ -z "${list}" ]] ; then
+            # echo "Prepending '${1}' to empty \$${var_name}"
+            eval "export ${var_name}=${1}"
+            continue
+        fi
+        if [[ "${remove}" ]] ; then
+            removeFrom "${var_name}" "${1}"
+        fi
+        case "${list}" in
+        ${1}|*:${1}|${1}:*|*:${1}:*) ;;
+        *)
+            eval "export ${var_name}=${1}:\${${var_name}}"
+            # echo "Prepending '${1}' to \$${var_name} (was ${list}, now ${!var_name})"
+        ;;
+        esac
+        shift
+    done
+}
+
+function appendTo ()
+{
+    local -r var_name="${1}" ; shift
+    local remove=""
+    if [[ "${1}" = -m ]] ; then
+        shift
+        remove=y
+    fi
+    while [[ $# -gt 0 ]] ; do
+        local -a list="${!var_name}"
+        if [[ -z "${list}" ]] ; then
+            # echo "Appending '${1}' to empty \$${var_name}"
+            eval "export ${var_name}=${1}"
+            continue
+        fi
+        if [[ "${remove}" ]] ; then
+            removeFrom "${var_name}" "${1}"
+        fi
+        case "${list}" in
+        ${1}|*:${1}|${1}:*|*:${1}:*) ;;
+        *)
+            eval "export ${var_name}=\${${var_name}}:${1}"
+            # echo "Appending '${1}' to \$${var_name} (was ${list}, now ${!var_name})"
+        ;;
+        esac
+        shift
+    done
+}
+
+function removeFrom ()
+{
+    local -r var_name="${1}" ; shift
+    local -a list="${!var_name}"
+    local -r del_me="${1}" ; shift
+    local cs_list="${!var_name}"
+    local new_cs_list
+    local el
+
+    local -i inf_limit=99
+
+    while [[ "${cs_list}" && ${inf_limit} -gt 0 ]] ; do
+        inf_limit=$((inf_limit - 1))
+
+        el=${cs_list##*:}
+        cs_list=${cs_list%:*}
+
+        if [[ "${el}" == "${cs_list}" ]] ; then
+            cs_list=""
+        fi
+
+        if [[ "${del_me}" != "${el}" ]] ; then
+            if [[ "${new_cs_list}" ]] ; then
+                new_cs_list="${el}:${new_cs_list}"
+            else
+                new_cs_list="${el}"
+            fi
+        # else
+            # echo "Removing '${el}' from \$${var_name}"
+        fi
+    done
+
+    eval "export ${var_name}=\"${new_cs_list}\""
+}
+
+function prependToPath ()
+{
+    prependTo PATH "${@}"
 }
 
 function appendToPath ()
 {
-    if [[ "${1}" = -m ]] ; then
-        shift
-        removeFromPath "${1}"
-    fi
-    case ":${PATH}:" in
-    *:${1}|${1}:*|*:${1}:*) ;;
-    *)
-        # echo "Appending '${1}' to PATH"
-        export PATH=${PATH}:${1}
-    ;;
-    esac
+    appendTo PATH "${@}"
 }
 
 function removeFromPath ()
 {
-    local -r del_me="${1}"
-    shift
-    local cs_list="${PATH}"
-    local new_cs_list
-    local el
-
-    local -i inf_limit=99
-
-    while [[ "${cs_list}" && ${inf_limit} -gt 0 ]] ; do
-        inf_limit=$((inf_limit - 1))
-
-        el=${cs_list##*:}
-        cs_list=${cs_list%:*}
-
-        if [[ "${el}" == "${cs_list}" ]] ; then
-            cs_list=""
-        fi
-
-        if [[ "${del_me}" != "${el}" ]] ; then
-            if [[ "${new_cs_list}" ]] ; then
-                new_cs_list="${el}:${new_cs_list}"
-            else
-                new_cs_list="${el}"
-            fi
-        fi
-    done
-
-    export PATH="${new_cs_list}"
+    removeFrom PATH "${@}"
 }
 
 function prependToLibpath ()
 {
-    case ":${LD_LIBRARY_PATH}:" in
-    *:${1}|${1}:*|*:${1}:*) ;;
-    *) export LD_LIBRARY_PATH=${1}:${LD_LIBRARY_PATH} ;;
-    esac
+    prependTo LD_LIBRARY_PATH "${@}"
 }
 
 function appendToLibpath ()
 {
-    case ":${LD_LIBRARY_PATH}:" in
-    *:${1}|${1}:*|*:${1}:*) ;;
-    *) export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${1} ;;
-    esac
+    appendTo LD_LIBRARY_PATH "${@}"
 }
 
 function removeFromLibpath ()
 {
-    local -r del_me="${1}"
-    shift
-    local cs_list="${LD_LIBRARY_PATH}"
-    local new_cs_list
-    local el
-
-    local -i inf_limit=99
-
-    while [[ "${cs_list}" && ${inf_limit} -gt 0 ]] ; do
-        inf_limit=$((inf_limit - 1))
-
-        el=${cs_list##*:}
-        cs_list=${cs_list%:*}
-
-        if [[ "${el}" == "${cs_list}" ]] ; then
-            cs_list=""
-        fi
-
-        if [[ "${del_me}" != "${el}" ]] ; then
-            if [[ "${new_cs_list}" ]] ; then
-                new_cs_list="${el}:${new_cs_list}"
-            else
-                new_cs_list="${el}"
-            fi
-        fi
-    done
-
-    export LD_LIBRARY_PATH="${new_cs_list}"
+    removeFrom LD_LIBRARY_PATH "${@}"
 }
 
 function prependToManpath ()
 {
-    case ":${MANPATH}:" in
-    *:${1}|${1}:*|*:${1}:*) ;;
-    *) export MANPATH=${1}:${MANPATH} ;;
-    esac
+    prependTo MANPATH "${@}"
 }
 
 function appendToManpath ()
 {
-    case ":${MANPATH}:" in
-    *:${1}|${1}:*|*:${1}:*) ;;
-    *) export MANPATH=${MANPATH}:${1} ;;
-    esac
+    appendTo MANPATH "${@}"
 }
 
 function removeFromManpath ()
 {
-    local arg="${1}"
-    local dir
-    local newPath
-
-    for dir in $(echo ${MANPATH} | tr : ' ') ; do
-        if [[ "${arg}" != "${dir}" ]] ; then
-            [[ -z "${newPath}" ]] || newPath="${newPath}:"
-            newPath="${newPath}${dir}"
-        fi
-    done
-
-    export MANPATH="${newPath}"
+    removeFrom MANPATH "${@}"
 }
+
+# function prependToPath ()
+# {
+    # if [[ "${1}" = -m ]] ; then
+        # shift
+        # removeFromPath "${1}"
+    # fi
+    # case ":${PATH}:" in
+    # *:${1}|${1}:*|*:${1}:*) ;;
+    # *)
+        # # echo "Prepending '${1}' to PATH"
+        # export PATH=${1}:${PATH}
+    # ;;
+    # esac
+# }
+
+# function appendToPath ()
+# {
+    # if [[ "${1}" = -m ]] ; then
+        # shift
+        # removeFromPath "${1}"
+    # fi
+    # case ":${PATH}:" in
+    # *:${1}|${1}:*|*:${1}:*) ;;
+    # *)
+        # # echo "Appending '${1}' to PATH"
+        # export PATH=${PATH}:${1}
+    # ;;
+    # esac
+# }
+
+# function removeFromPath ()
+# {
+    # local -r del_me="${1}"
+    # shift
+    # local cs_list="${PATH}"
+    # local new_cs_list
+    # local el
+
+    # local -i inf_limit=99
+
+    # while [[ "${cs_list}" && ${inf_limit} -gt 0 ]] ; do
+        # inf_limit=$((inf_limit - 1))
+
+        # el=${cs_list##*:}
+        # cs_list=${cs_list%:*}
+
+        # if [[ "${el}" == "${cs_list}" ]] ; then
+            # cs_list=""
+        # fi
+
+        # if [[ "${del_me}" != "${el}" ]] ; then
+            # if [[ "${new_cs_list}" ]] ; then
+                # new_cs_list="${el}:${new_cs_list}"
+            # else
+                # new_cs_list="${el}"
+            # fi
+        # fi
+    # done
+
+    # export PATH="${new_cs_list}"
+# }
+
+# function prependToLibpath ()
+# {
+    # case ":${LD_LIBRARY_PATH}:" in
+    # *:${1}|${1}:*|*:${1}:*) ;;
+    # *) export LD_LIBRARY_PATH=${1}:${LD_LIBRARY_PATH} ;;
+    # esac
+# }
+
+# function appendToLibpath ()
+# {
+    # case ":${LD_LIBRARY_PATH}:" in
+    # *:${1}|${1}:*|*:${1}:*) ;;
+    # *) export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${1} ;;
+    # esac
+# }
+
+# function removeFromLibpath ()
+# {
+    # local -r del_me="${1}"
+    # shift
+    # local cs_list="${LD_LIBRARY_PATH}"
+    # local new_cs_list
+    # local el
+
+    # local -i inf_limit=99
+
+    # while [[ "${cs_list}" && ${inf_limit} -gt 0 ]] ; do
+        # inf_limit=$((inf_limit - 1))
+
+        # el=${cs_list##*:}
+        # cs_list=${cs_list%:*}
+
+        # if [[ "${el}" == "${cs_list}" ]] ; then
+            # cs_list=""
+        # fi
+
+        # if [[ "${del_me}" != "${el}" ]] ; then
+            # if [[ "${new_cs_list}" ]] ; then
+                # new_cs_list="${el}:${new_cs_list}"
+            # else
+                # new_cs_list="${el}"
+            # fi
+        # fi
+    # done
+
+    # export LD_LIBRARY_PATH="${new_cs_list}"
+# }
+
+# function prependToManpath ()
+# {
+    # case ":${MANPATH}:" in
+    # *:${1}|${1}:*|*:${1}:*) ;;
+    # *) export MANPATH=${1}:${MANPATH} ;;
+    # esac
+# }
+
+# function appendToManpath ()
+# {
+    # case ":${MANPATH}:" in
+    # *:${1}|${1}:*|*:${1}:*) ;;
+    # *) export MANPATH=${MANPATH}:${1} ;;
+    # esac
+# }
+
+# function removeFromManpath ()
+# {
+    # local arg="${1}"
+    # local dir
+    # local newPath
+
+    # for dir in $(echo ${MANPATH} | tr : ' ') ; do
+        # if [[ "${arg}" != "${dir}" ]] ; then
+            # [[ -z "${newPath}" ]] || newPath="${newPath}:"
+            # newPath="${newPath}${dir}"
+        # fi
+    # done
+
+    # export MANPATH="${newPath}"
+# }
 
 function appendToList ()
 {

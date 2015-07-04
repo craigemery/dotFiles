@@ -32,7 +32,7 @@ export HISTSIZE=1000
 
 # include colorls.bash
 
-export CDPATH=.:${HOME}
+prependTo CDPATH ${HOME} .
 export PAGER=less
 export LESS="-R"
 export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"

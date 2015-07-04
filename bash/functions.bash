@@ -290,6 +290,19 @@ function repeat ()
     done
 }
 
+# "range" command.  Like:
+#
+#       repeat 0 10 echo foo
+function xrange ()
+{
+    local -i i=${1} ; shift
+    local -ri end=${1} ; shift
+    while [ ${i} -lt ${end} ] ; do
+        eval "${@}"
+        i=$(($i + 1))
+    done
+}
+
 function printArgs ()
 {
     local count=0
@@ -1060,6 +1073,8 @@ function rmSwaps ()
 function findPy ()
 {
     local f
+    local -r nocase=$(shopt -p nocasematch)
+    shopt -s nocasematch
     findFiles "${@}" | while read f ; do
         case "${f}" in
         *.py) echo "${f}" ;;
@@ -1071,6 +1086,12 @@ function findPy ()
         ;;
         esac
     done
+    eval "${nocase}"
+}
+
+function findPyModule ()
+{
+    findNamed -n '*.py' | sed -ne '/^'"$1"'\.py$/p' -e '/\/'"$1"'\.py$/p' -e '/^'"$1"'\/__init__\.py$/p' -e '/\/'"$1"'\/__init__\.py$/p' | egrep -e "$1"
 }
 
 function findTempPy ()

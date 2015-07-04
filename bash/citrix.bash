@@ -1,7 +1,10 @@
 #!/usr/bin/bash
 
 . $(dirname $(readlink -f "${BASH_SOURCE[0]}"))/hg.bash
-. $(dirname $(readlink -f "${BASH_SOURCE[0]}"))/git.bash
+. $(dirname $(readlink -f "${BASH_SOURCE[0]}"))/dvcs.bash
+
+appendTo CDPATH ~/src/closed
+appendTo CDPATH ~/src/carbon
 
 function make_ssh_wrappers_citrix ()
 {

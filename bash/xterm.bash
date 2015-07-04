@@ -197,6 +197,15 @@ function fake_xterm_title ()
     titles both "${USER}@${HOSTNAME%%.*}:${wd}"
 }
 
+if [[ ${BASH_VERSINFO[0]} -gt 3 ]] ; then
+function set_display ()
+{
+    if [[ "${DISPLAY}" =~ (localhost):([0-9]+)\.([0-9]) ]] ; then
+        export DISPLAY=${BASH_REMATCH[1]}:${1}.${BASH_REMATCH[3]}
+    fi
+}
+fi
+
 function __xterm ()
 {
    . xterm.bash

@@ -87,6 +87,7 @@ def vim_global(name, kind=str):
 
 
 class VimAppendHandler(logging.Handler):
+    # pylint: disable=too-few-public-methods
     """ Logger handler that finds a buffer and appends the log message as a new line """
     def __init__(self, name):
         logging.Handler.__init__(self)
@@ -171,12 +172,12 @@ class AutoTag(object):  # pylint: disable=R0902
                 ret = (fname, tags_file)
                 break
             elif tags_dir and tags_dir == self.stop_at:
-                AutoTag.LOG.info("Reached %s. Making one %s" % (self.stop_at, tags_file))
+                AutoTag.LOG.info("Reached %s. Making one %s", self.stop_at, tags_file)
                 open(tags_file, 'wb').close()
                 ret = (fname, tags_file)
                 break
             elif not fname or fname == os.sep or fname == "//" or fname == "\\\\":
-                AutoTag.LOG.info('bail (file = "%s")' % (fname, ))
+                AutoTag.LOG.info('bail (file = "%s")', fname)
                 break
         return ret
 
@@ -235,7 +236,10 @@ class AutoTag(object):  # pylint: disable=R0902
         """ Strip all tags for the source file, then re-run ctags in append mode """
         if self.tags_dir:
             sources = [os.path.join(self.parents + s) for s in sources]
-        self.stripTags(tags_file, sources)
+        try:
+            self.stripTags(tags_file, sources)
+        except OSError:
+            return
         if self.tags_file:
             cmd = "%s -f %s -a " % (self.ctags_cmd, self.tags_file)
         else:

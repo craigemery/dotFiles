@@ -56,6 +56,10 @@ if !exists('g:pylint_cwindow')
     let g:pylint_cwindow = 1
 endif
 
+if !exists('g:pylint_pep8_if_10')
+    let g:pylint_pep8_if_10 = 1
+endif
+
 if exists(':Pylint') != 2
     command Pylint :call Pylint(0)
 endif
@@ -108,6 +112,7 @@ function! Pylint(writing)
     if g:pylint_show_rate
         echon 'code rate: ' b:pylint_rate ', prev: ' b:pylint_prev_rate
     endif
+
 endfunction
 
 function! PylintEvaluation()

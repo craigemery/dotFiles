@@ -5,6 +5,7 @@
 "endif
 
 filetype off
+set number
 set rtp^=~/.dotFiles/vim/bundle/vundle
 call vundle#rc()
 Bundle 'gmarik/vundle'
@@ -28,7 +29,9 @@ set wildignore+=*.pyc
 set wildignore+=*.o
 set incsearch
 set makeprg=gmake
-set colorcolumn=100
+if exists("&colorcolumn")
+  set colorcolumn=100
+endif
 set mouse=a
 let g:netrw_cygwin=1
 
@@ -61,21 +64,27 @@ set laststatus=2
 
 if &term =~ "xterm"
   if has("terminfo")
-    set t_Co=8
+    set t_Co=256
     set t_Sf=[3%p1%dm
     set t_Sb=[4%p1%dm
   else
-    set t_Co=8
+    set t_Co=256
     set t_Sf=[3%dm
     set t_Sb=[4%dm
   endif
+elseif &term =~ "screen-256color"
+  set noicon
+  set term=xterm-256color
+    set t_Co=256
 elseif &term =~ "screen"
   set noicon
 endif
 
 syntax enable
 "colorscheme pablo
-colorscheme koehler
+"colorscheme koehler
+"colorscheme ron
+colorscheme slate
 "set background=dark
 "highlight Normal guifg=#e0e0ff guibg=#404040
 
@@ -261,6 +270,7 @@ if has("win32")
 endif
 
 "runtime version_control-cvs.vim
+map <Leader>cV \cG\cv<C-w><C-w>
 
 noremap <C-W><C-Left> <C-W><Left>
 noremap <C-W><C-Right> <C-W><Right>
@@ -274,6 +284,7 @@ runtime patch.vim
 noremap <Leader>gf :execute(":bel vsplit ".expand("<cfile>"))<CR>
 
 let g:NERDTreeOpenVSplitBelowRight=1
+let g:NERDSpaceDelims=1
 
 " I find the following saved session options cause problems, best to 'just get the buffers and tabs' and that's about it
 set sessionoptions-=folds
