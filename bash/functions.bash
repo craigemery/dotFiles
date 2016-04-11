@@ -325,9 +325,9 @@ function printArgs ()
 
 function msg ()
 {
-    [[ -t 1 ]] && colour bold
+    [[ -t 1 ]] && colour bold >&2
     printArgs "${@}" >&2
-    [[ -t 1 ]] && colour reset
+    [[ -t 1 ]] && colour reset >&2
 }
 
 function diag ()
@@ -668,10 +668,17 @@ function __FI ()
         done
         unset RESULT
 
-        if [[ "${less}" ]] ; then
-            ${findCmdName} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} "${before[@]}" "${after[@]}" ${colour} ${listonly} "${patterns[@]}" | less -fR
+        if [[ "${GREP_OPTIONS}" ]] ; then
+            local -r egrep=(egrep "${GREP_OPTIONS}")
+            unset GREP_OPTIONS
         else
-            ${findCmdName} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 egrep ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} "${before[@]}" "${after[@]}" ${colour} ${listonly} "${patterns[@]}"
+            local -r egrep=(egrep)
+        fi
+
+        if [[ "${less}" ]] ; then
+            ${findCmdName} ${sudo_flag} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 "${egrep[@]}" ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} "${before[@]}" "${after[@]}" ${colour} ${listonly} "${patterns[@]}" | less -fR
+        else
+            ${findCmdName} ${sudo_flag} ${sudo_cmd} ${pruneless} "${prune_dirs[@]}" "${excludes[@]}" -0 "${dir_list[@]}" | ${sudo} xargs -0 -n99 "${egrep[@]}" ${ignoreBinary} ${binary_files_allowed} ${case} ${numbers} "${before[@]}" "${after[@]}" ${colour} ${listonly} "${patterns[@]}"
         fi
 
     fi
