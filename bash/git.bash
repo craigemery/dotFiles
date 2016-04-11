@@ -72,7 +72,8 @@ function gitmissing ()
 
 function gitneedscommit ()
 {
-    __gitst ".[MADR]" "${@}"
+    __gitst ".[MDR]" "${@}"
+    __gitst "A " "${@}"
 }
 
 function gitneedscommit_count ()
