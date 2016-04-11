@@ -1,6 +1,6 @@
 #!/bin/bash
 if ! shopt -q login_shell ; then
-   export PATH=/usr/bin:/bin:/usr/X11R6/bin:$PATH
+   export PATH=/usr/local/sbin:/usr/bin:/bin:/usr/X11R6/bin:$PATH
    #export PATH=C:\\utils\\cygwin\\bin:C:\\utils\\cygwin\\usr\\bin:$PATH
    export USER=cemery
 fi
