@@ -3,6 +3,8 @@
 . $(dirname $(readlink -f "${BASH_SOURCE[0]}"))/hg.bash
 . $(dirname $(readlink -f "${BASH_SOURCE[0]}"))/git.bash
 
+DVCS_ROOT=""
+
 function _is_git_dir ()
 {
     test -d "${1}/.git"
@@ -36,8 +38,10 @@ function _guess_dvcs ()
 {
     local -r candidate=$(_find_dvcs_dir "${@}")
     if _is_git_dir "${candidate}" ; then
+        DVCS_ROOT="${candidate}"
         RESULT="git"
     elif _is_hg_dir "${candidate}" ; then
+        DVCS_ROOT="${candidate}"
         RESULT="hg"
     fi
 }
@@ -52,7 +56,7 @@ function Dguess ()
 function _make_Dfunc ()
 {
     while [[ $# -gt 0 ]] ; do
-        eval 'D'"${1}"' () { local RESULT ; _guess_dvcs ; [[ "${RESULT}" ]] && ${RESULT}'"${1}" \"\${@}\"' ; }'
+        eval 'D'"${1}"' () { local RESULT ; _guess_dvcs ; [[ "${RESULT}" ]] && ${RESULT}'"${1}" \"\${@}\"' ; DVCS_ROOT=""; }'
         shift
     done
 }
@@ -60,7 +64,7 @@ function _make_Dfunc ()
 function _make_Dsimplefunc ()
 {
     while [[ $# -gt 0 ]] ; do
-        eval 'D'"${1}"' () { local RESULT ; _guess_dvcs ; [[ "${RESULT}" ]] && ( ${RESULT}root && ${RESULT} '"${1}" \"\${@}\"' ) ; }'
+        eval 'D'"${1}"' () { local RESULT ; _guess_dvcs ; [[ "${RESULT}" ]] && ( ${RESULT}root && ${RESULT} '"${1}" \"\${@}\"' ) ; DVCS_ROOT=""; }'
         shift
     done
 }
