@@ -82,9 +82,9 @@ endif
 
 syntax enable
 "colorscheme pablo
-"colorscheme koehler
+colorscheme koehler
 "colorscheme ron
-colorscheme slate
+"colorscheme slate
 "set background=dark
 "highlight Normal guifg=#e0e0ff guibg=#404040
 
