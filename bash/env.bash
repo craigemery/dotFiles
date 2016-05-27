@@ -49,24 +49,24 @@ function ntty ()
 }
 
 if [[ -z "$(declare -f _powerline_prompt)" ]] ; then
-xtermTitle '${USER}@${HOSTNAME%%.*}:$(ntty):cwd=$(npwd)'
-rxvtTitle '$(ntty):$(npwd)'
+[[ "$(declare -f xtermTitle)" ]] && xtermTitle '${USER}@${HOSTNAME%%.*}:$(ntty):cwd=$(npwd)'
+[[ "$(declare -f rxvtTitle)" ]] && rxvtTitle '$(ntty):$(npwd)'
 
 case $TERM in
     *rxvt|cygwin*|screen*|xterm*)
         if [ ! -e /etc/sysconfig/bash-prompt-xterm ]; then
             PS1=""
-            PROMPT_COMMAND='echo -n "$(titles both '${XTERM_TITLE}')"'
+            [[ "$(declare -f titles)" ]] && PROMPT_COMMAND='echo -n "$(titles both '${XTERM_TITLE}')"'
         fi
     ;;
 
     *rxvt)
         PS1=""
-        PROMPT_COMMAND='echo -n "$(titles both '${RXVT_TITLE}')"'
+        [[ "$(declare -f titles)" ]] && PROMPT_COMMAND='echo -n "$(titles both '${RXVT_TITLE}')"'
     ;;
 
     linux)
-        PS1="\[$(colour fg green 2>&-)\]\w: "
+        [[ "$(declare -f colour)" ]] && PS1="\[$(colour fg green 2>&-)\]\w: "
     ;;
 esac
 

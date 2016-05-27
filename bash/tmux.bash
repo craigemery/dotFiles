@@ -12,7 +12,8 @@ if [ -n "$(which tmux 2>/dev/null)" ]; then
         local tmux=$(type -fp tmux)
         case "$1" in
             copy-buffer)
-                $tmux show-buffer | DISPLAY=:0.0 xclip -i
+                local d="$(td=~/.tmux.display ; [[ -f $td ]] && cat $td)"
+                $tmux show-buffer | DISPLAY=${d:-:0.0} xclip -i
                 ;;
             vim)
                 $tmux split-window -p 10 vim ; $tmux rotate-window ; $tmux select-pane -U
