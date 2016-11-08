@@ -70,12 +70,12 @@ endif
 
 " We should echo filename because pylint truncates .py
 " If someone know better way - let me know :) 
-CompilerSet makeprg=(echo\ '[%]';\ pylint\ -r\ y\ %)
+CompilerSet makeprg=pylint.bat\ -r\ y\ %
 
 " We could omit end of file-entry, there is only one file
 " %+I... - include code rating information
 " %-G... - remove all remaining report lines from quickfix buffer
-CompilerSet efm=%+P[%f],%t:\ %#%l\\,\ %#%c:%m,%t:\ %#%l:%m,%Z,%+IYour\ code%m,%Z,%-G%.%#
+CompilerSet errorformat=%+P[%f],%t:\ %#%l\\,\ %#%c:%m,%t:\ %#%l:%m,%Z,%+IYour\ code%m,%Z,%-G%.%#
 
 if g:pylint_onwrite
     augroup python
@@ -85,6 +85,10 @@ if g:pylint_onwrite
 endif
 
 function! Pylint(writing)
+    if &ft != "python"
+        return
+    endif
+
     if !a:writing && &modified
         " Save before running
         write
@@ -105,6 +109,7 @@ function! Pylint(writing)
 
     if g:pylint_cwindow
         cwindow
+        crewind
     endif
 
     call PylintEvaluation()
@@ -112,7 +117,6 @@ function! Pylint(writing)
     if g:pylint_show_rate
         echon 'code rate: ' b:pylint_rate ', prev: ' b:pylint_prev_rate
     endif
-
 endfunction
 
 function! PylintEvaluation()
@@ -120,7 +124,7 @@ function! PylintEvaluation()
     let b:pylint_rate = '0.00'
     let b:pylint_prev_rate = '0.00'
     for l:item in l:list
-        if l:item.type == 'I' && l:item.text =~ 'Your code has been rated'
+        if l:item.type == 'I' && l:item.text =~ 'Your code has been rated at'
             let l:re_rate = '\(-\?[0-9]\{1,2\}\.[0-9]\{2\}\)/'
             let b:pylint_rate = substitute(l:item.text, '.*rated at '.l:re_rate.'.*', '\1', 'g')
             " Only if there is information about previous run
