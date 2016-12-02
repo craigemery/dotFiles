@@ -1,7 +1,9 @@
 """
+(c) Craig Emery 2016
 AutoTag.py
 """
 
+from __future__ import print_function
 import os
 import os.path
 import fileinput
@@ -48,10 +50,16 @@ if sys.version < '2.4':
 else:
     import subprocess
 
+    kw = {"shell": True,
+          "stdin": subprocess.PIPE,
+          "stdout": subprocess.PIPE,
+          "stderr": subprocess.PIPE}
+    if sys.version >= '3.5':
+        kw["universal_newlines"] = True
+
     def do_cmd(cmd, cwd):
         """ Abstract subprocess """
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                             cwd=cwd)
+        p = subprocess.Popen(cmd, cwd=cwd, **kw)
         so = p.communicate()[0]
         return so.split("\n")
 
@@ -224,7 +232,7 @@ class AutoTag(object):  # pylint: disable=R0902
             for l in source:
                 l = l.strip()
                 if self.goodTag(l, sources):
-                    print l
+                    print(l)
         finally:
             source.close()
             try:

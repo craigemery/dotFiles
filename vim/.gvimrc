@@ -38,7 +38,8 @@ set guioptions-=T
 if has ("unix") && !has("mac")
 "   call CraigsFont("misc-fixed", 12)
 "   call CraigsFont("lucinda-type", 10)
-    call CraigsFont("Liberation", 8)
+"   call CraigsFont("Liberation", 8)
+    call CraigsFont("DejaVu", 8)
     "set guifont=Menlo\ Regular:h13
 endif
 

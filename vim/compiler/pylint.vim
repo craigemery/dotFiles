@@ -70,7 +70,8 @@ endif
 
 " We should echo filename because pylint truncates .py
 " If someone know better way - let me know :) 
-CompilerSet makeprg=pylint.bat\ -r\ y\ %
+" CompilerSet makeprg=pylint.bat\ -r\ y\ %
+CompilerSet makeprg=(echo\ '[%]';\ pylint\ -r\ y\ %)
 
 " We could omit end of file-entry, there is only one file
 " %+I... - include code rating information

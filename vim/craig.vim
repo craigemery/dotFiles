@@ -142,7 +142,7 @@ function! CraigsFont (name, size)
   elseif a:name == "monospace"
       set guifont=Monospace\ 8
   elseif a:name == "DejaVu"
-      set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 8
+      set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 10
   elseif a:name == "Liberation"
       set guifont=Liberation\ Mono\ for\ Powerline\ 8
   endif

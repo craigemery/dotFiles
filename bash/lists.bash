@@ -16,6 +16,7 @@ function prependTo ()
             continue
         fi
         if [[ "${remove}" ]] ; then
+            # echo "Removing '${1}' from \${var_name}"
             removeFrom "${var_name}" "${1}"
         fi
         case "${list}" in
@@ -45,6 +46,7 @@ function appendTo ()
             continue
         fi
         if [[ "${remove}" ]] ; then
+            # echo "Removing '${1}' from \${var_name}"
             removeFrom "${var_name}" "${1}"
         fi
         case "${list}" in
