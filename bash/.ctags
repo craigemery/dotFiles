@@ -4,6 +4,8 @@
 --langmap=make:+.mk
 --langmap=c:+.hec.hep.het.hev.hem.heo.hei.hic.hip.hit.hiv.him.hio.hii.inl.bid
 --langmap=python:+.pmake
+--langmap=python:+(SConstruct)
+--langmap=python:+(SConscript)
 --exclude=*/docs/*
 --exclude=heapcon.c
 --exclude=infmt.c
@@ -17,10 +19,12 @@
 --exclude=*.vc?
 --exclude=*/test/ARM*
 --exclude=*/test/x86*
---exclude=*/build/*
+--exclude=build/*
 --exclude=*.sql
 --exclude=*.schema
 --exclude=Session.vim
+--exclude=.git/*
+--exclude=.svn/*
 
 --links=no
 

@@ -38,7 +38,7 @@
 "   other compiler.
 "
 
-
+finish
 if exists('current_compiler')
   finish
 endif

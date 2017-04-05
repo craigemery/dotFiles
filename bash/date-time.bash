@@ -132,6 +132,18 @@ function elapsed ()
     fi
 }
 
+function time_it ()
+{
+    local -r name="${1}" ;
+    shift ;
+    msg At $(date) starting "${name}" >&2 ;
+    local -i RESULT ;
+    __secondsSinceEpoch ;
+    "${@}" ;
+    msg After $(elapsed ${RESULT}) finished "${name}" >&2 ;
+    unset RESULT ;
+}
+
 function ordinal ()
 {
     local day=${1}

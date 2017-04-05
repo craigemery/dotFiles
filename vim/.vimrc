@@ -4,20 +4,39 @@
 "call InitPerforce()
 "endif
 
+let g:airline_powerline_fonts = 1
+
 filetype off
 set number
-set rtp^=~/.dotFiles/vim/bundle/vundle
-call vundle#rc()
-Bundle 'gmarik/vundle'
-"Bundle 'bling/vim-bufferline'
-filetype plugin on
+set rtp^=~/.dotFiles/vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'vim-syntastic/syntastic'
+Plugin 'Glench/Vim-Jinja2-Syntax'
 filetype plugin indent on
+filetype plugin on
+call vundle#end()
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
 
 let Tlist_Show_Menu=1
 if has("win32")
   let $PATH = $PATH . ";C:/Program Files/Git/bin"
   let $PATH = $PATH . ";C:/cygwin/bin"
 endif
+
+" function! EnableMenu()
+  " source $VIMRUNTIME/menu.vim
+  " set wildmenu
+  " set cpo-=<
+  " set wcm=<C-Z>
+  " map <F4> :emenu <C-Z>
+" endfunction
 
 set nocompatible
 

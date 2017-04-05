@@ -1,11 +1,11 @@
 #! /bin/bash
 
 #. cvs.bash
-. tags.bash
+# . tags.bash
 . strings.bash
-. ssh.bash
-. citrix.bash
-. home.bash
+# . ssh.bash
+# . citrix.bash
+# . home.bash
 
 # . java.bash
 # . dir.bash
@@ -325,9 +325,9 @@ function printArgs ()
 
 function msg ()
 {
-    [[ -t 1 ]] && colour bold >&2
+    [[ -t 2 ]] && colour bold >&2
     printArgs "${@}" >&2
-    [[ -t 1 ]] && colour reset >&2
+    [[ -t 2 ]] && colour reset >&2
 }
 
 function diag ()
@@ -378,7 +378,7 @@ function doColour ()
     # the user *asked* for colour
     local -r arg="${1}"
     [ "${arg}" ] && return 0 # enable color as requested
-    if [ -t 1 ] ; then
+    if [ -t 2 ] ; then
         case "${TERM}" in
         # enable colour for terminals that we know how to do colour for
         *rxvt|cygwin|xterm*|linux) return 0 ;;
@@ -1136,10 +1136,10 @@ function caselessRE ()
 function getCR ()
 {
     local -i ret=${1}
-    [[ -t 1 ]] && colour fg green
+    [[ -t 2 ]] && colour fg green
     trap "echo '' ; stty echo ; return ${ret}" INT
     echo -ne "Please hit return to continue:"
-    [[ -t 1 ]] && colour reset
+    [[ -t 2 ]] && colour reset
     stty -echo
     read line
     stty echo
@@ -1329,7 +1329,7 @@ function Sleep ()
 {
     local -i seconds=${1}
     [[ ${seconds} -gt 0 ]] && while [[ ${seconds} -gt 0 ]] ; do
-        read -t 1 -p .
+        read -t 2 -p .
         seconds=$((${seconds}-1))
     done
 }
@@ -1344,6 +1344,11 @@ function comment_line ()
     local -ri n=${1}
     local -r fname="${2}"
     sed -ie "$n,$n s@^@#@" ${fname}
+}
+
+function vimr ()
+{
+    vim --servername vim --remote-silent "${@}";
 }
 
 # vim:sw=4:ts=4

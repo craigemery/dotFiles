@@ -42,6 +42,7 @@
 " Section: Plugin header {{{1
 
 if exists('VCSCommandDisableAll')
+	echohl WarningMsg|echomsg 'VCSCommand all disabled'|echohl None
 	finish
 endif
 
@@ -54,6 +55,7 @@ runtime plugin/vcscommand.vim
 
 if !executable(VCSCommandGetOption('VCSCommandSVNExec', 'svn'))
 	" SVN is not installed
+	echohl WarningMsg|echomsg 'VCSCommand svn not installed'|echohl None
 	finish
 endif
 

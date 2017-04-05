@@ -8,7 +8,7 @@ endif
 let g:PerforceSetUp=1
 
 "source ~/.dotFiles/vim/build.vim
-runtime build.vim
+" runtime build.vim
 
 function! GetClient(cfg)
     if filereadable(a:cfg)

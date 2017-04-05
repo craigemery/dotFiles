@@ -116,11 +116,11 @@ map <M-PageUp> :cp<CR>
 map <M-Home> :cfirst<CR>
 map <M-End> :clast<CR>
 map <M-Del> :cclose<CR>
-"map <M-Ins> :botright copen<CR><C-W>p
+" map <M-Ins> :botright copen<CR><C-W>p
 map <M-Ins> :cal MyCopen()<CR>
-map <F4> :botright copen<CR><C-W>p:call Compile()<CR>
-"map <C-F4> :mak<CR>
-map <C-F4> :cd .<CR>:mak -d -V dist<CR>
+" map <F4> :botright copen<CR><C-W>p:call Compile()<CR>
+" map <C-F4> :mak<CR>
+" map <C-F4> :cd .<CR>:mak -d -V dist<CR>
 
 if !exists("tools_grown")
     let tools_grown = 1
