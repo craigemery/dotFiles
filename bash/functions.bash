@@ -18,6 +18,14 @@
 # . protest.bash
 # . barona.bash
 
+export LESS="-R"
+export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"
+
+function __silent ()
+{
+    "${@}" > /dev/null 2>&1
+}
+
 function __funcname_entry()
 {
     local -i idx=${1}

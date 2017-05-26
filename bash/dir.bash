@@ -72,7 +72,7 @@ function chdir ()
 
 function back
 {
-    popd > /dev/null 2>&1 "${@}"
+    __silent popd "${@}"
 }
 
 function b
