@@ -37,6 +37,18 @@ function! Toggle_wide_78 ()
   endif
 endfunction
 
+function! Toggle_mouse ()
+  if &mouse =~# 'a'
+    set mouse-=a
+    echo "Mouse mode disabled"
+  else
+    set mouse+=a
+    echo "Mouse mode re-enabled"
+  endif
+endfunction
+
+map <Leader>M :call Toggle_mouse()<CR>
+
 if has("unix")
   amenu 90.20 &Craig.Make\ this\ file\ &executable :!chmod a+x "%"<CR>:e!<CR>
   amenu 90.30 &Craig.Make\ this\ file\ &writeable :!chmod a+w "%"<CR>:e!<CR>
@@ -169,5 +181,33 @@ function! DiffFixAddresses()
 endfunction
 
 amenu 90.230 &Craig.Saniti&ze\ Addresses\ For\ Diff  :call DiffFixAddresses()<CR>
+
+function! s:DiffWithSaved()
+  let filetype=&ft
+  diffthis
+  vnew | r # | normal! 1Gdd
+  diffthis
+  exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
+endfunction
+com! DiffSaved call s:DiffWithSaved()
+
+function! s:DiffWithCVSCheckedOut()
+  let filetype=&ft
+  diffthis
+  vnew | r !cvs up -pr BASE #
+  1,6d
+  diffthis
+  exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
+endfunction
+com! DiffCVS call s:DiffWithCVSCheckedOut()
+
+function! s:DiffWithSVNCheckedOut()
+  let filetype=&ft
+  diffthis
+  bel vnew | exe "%!svn cat " . expand("#:p")
+  diffthis
+  exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
+endfunction
+com! DiffSVN call s:DiffWithSVNCheckedOut()
 
 " vim:shiftwidth=2
