@@ -41,7 +41,7 @@ function! <SID>Pep8()
 	  echohl GreenBar
 	  echomsg "PEP8 correct"
 	  echohl None
-	  cclose
+	  lclose
   endif
 endfunction
 
