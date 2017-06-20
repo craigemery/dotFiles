@@ -14,7 +14,7 @@ esac
 function _do_logname ()
 {
     # assume local log
-    log="${PWD}.${1}.out";
+    log="${PWD}/.${PWD##*/}.${1}.out";
 }
 
 function _do_logit ()
@@ -87,7 +87,7 @@ function _bat ()
 
 function _clean_build ()
 {
-    rm -fr build;
+    ( local -r B=build.$$; mv build $B; rm -fr $B & ) > /dev/null 2>&1
 }
 
 function _clean_scons ()
