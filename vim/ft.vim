@@ -64,7 +64,7 @@ endfunction
 
 function! Enter_python()
   if &ft == 'python'
-    set shiftwidth=4
+    set shiftwidth=2
     compiler pylint
 "   compiler pep8
   endif
