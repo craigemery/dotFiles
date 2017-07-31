@@ -1078,6 +1078,11 @@ function findSwaps ()
     findNamed -X -n '.sw?' -n '.*.sw?'
 }
 
+function unSwapSwaps ()
+{
+    findSwaps | sed -e 's@\(.*/\)\.\(.*\)\.sw.$@\1\2@'
+}
+
 function rmSwaps ()
 {
     findSwaps "${@}" | xargs -rtn1 rm
