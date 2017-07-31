@@ -1,4 +1,4 @@
 # Copy me to ~/setup.cfg
 [pep8]
-ignore = E402,E501,E731
+ignore = E402,E501,E731,E111,E114
 max-line-length = 132

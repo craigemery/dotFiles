@@ -53,7 +53,7 @@ if exists(":CompilerSet") != 2          " older Vim always used :setlocal
   command -nargs=* CompilerSet setlocal <args>
 endif
 
-CompilerSet makeprg=(echo\ '[%]';\ pep8\ --repeat\ --ignore=E501\ %)
+CompilerSet makeprg=(echo\ '[%]';\ pep8\ --repeat\ --ignore=E111,E501\ %)
 
 CompilerSet efm=%f:%l:%m
 
