@@ -210,4 +210,27 @@ function! s:DiffWithSVNCheckedOut()
 endfunction
 com! DiffSVN call s:DiffWithSVNCheckedOut()
 
+function! s:ReindentBuffer()
+  normal! mzgg=G`z
+endfunction
+
+com! BufferReindent call s:ReindentBuffer()
+map <F7> :BufferReindent<CR>
+
+function! s:Reindent4TO2()
+  setlocal noexpandtab sw=4 ts=4
+  BufferReindent
+  setlocal expandtab sw=2 ts=2
+  BufferReindent
+endfunction
+com! Reindent4TO2 call s:Reindent4TO2()
+
+function! s:Reindent2TO4()
+  setlocal noexpandtab sw=2 ts=2
+  BufferReindent
+  setlocal expandtab sw=4 ts=4
+  BufferReindent
+endfunction
+com! Reindent2TO4 call s:Reindent2TO4()
+
 " vim:shiftwidth=2
