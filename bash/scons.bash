@@ -93,11 +93,17 @@ function _clean_build ()
 function _clean_scons ()
 {
     scons -c;
+    _clean_vim_swap build/
 }
 
 function _clean_pyc ()
 {
     find -name '*.py[co]' -print0 | xargs -0rtn99 rm 2>&1 ;
+}
+
+function _clean_vim_swap ()
+{
+    find "${@}" -name '.*.sw?' -print0 | xargs -0rtn99 rm 2>&1 ;
 }
 
 function _find_test_xml ()
