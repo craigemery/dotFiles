@@ -23,7 +23,7 @@ function _do_logit ()
     # date > "${log}";
     # local -i RESULT
     # __secondsSinceEpoch
-    echo "$*" >> "${log}";
+    echo "$*" > "${log}";
     time_it "${1}" "${@}" 2>&1 | tr '\015' '\012' | tee -a "${log}";
     # date | tee -a "${log}";
     # elapsed ${RESULT} | tee -a "${log}";
